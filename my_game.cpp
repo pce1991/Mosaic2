@@ -1,11 +1,14 @@
 
-#include "engine.cpp"
+#include "src/engine.cpp"
+
 
 void MosaicInit() {  
- 
+    SetMosaicGridSize(9, 9);
+    Mosaic->padding = 2;
 }
 
 void MosaicUpdate() {
+
     MTile*tiles = Mosaic->tiles;
         for (int y = 0; y < Mosaic->gridHeight; y++) {
             for (int x = 0; x < Mosaic->gridWidth; x++) {

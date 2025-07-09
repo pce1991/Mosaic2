@@ -34,7 +34,7 @@
 
 #include "raylib.h"
 
-#include "src/mosaic.cpp"
+#include "mosaic.cpp"
 
 // I want to treat this like the platform layer. That means the user should never be
 // opening this file. Can I use a macro simply to supply the included my_game file 
@@ -58,11 +58,15 @@ void MosaicUpdate();
 float32 Time = 0;
 float32 DeltaTime = 0;
 
+
+Texture2D testTexture = {};
+
 //------------------------------------------------------------------------------------
 // Program main entry point
 //------------------------------------------------------------------------------------
 int main(void)
 {
+
     // Initialization
     //--------------------------------------------------------------------------------------
     Platform.screenWidth = 3200;
@@ -87,10 +91,21 @@ int main(void)
     
     // @TODO: maybe I should just change the tile size to be 10 by default so that 
     
+    testTexture = LoadTexture("data/test.png");        // Texture loading
 
-    SetMosaicGridSize(32, 32);
-    Mosaic->padding = 8;
-    
+
+    SetMosaicGridSize(9, 9);
+    Mosaic->padding = 4;
+
+    MosaicInit();
+
+    // Main game loop
+    while (!WindowShouldClose())    // Detect window close button or ESC key
+    {
+        Time = GetTime();
+        DeltaTime = GetFrameTime();
+        
+       // @HACK: just do this when the grid resizes in Mosaic     
     {
         float32 levelAspect = Mosaic->gridWidth / Mosaic->gridHeight;
         float32 screenAspect = Platform.screenWidth / (1.0f * Platform.screenHeight);
@@ -114,13 +129,6 @@ int main(void)
     }
     
 
-MosaicInit();
-
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
-    {
-        Time = GetTime();
-        DeltaTime = GetFrameTime();
 
         // Update
         //----------------------------------------------------------------------------------
@@ -169,7 +177,33 @@ MosaicInit();
         
        //DrawRectangle(-300, -250, 50, 50, GRAY);
 
+        DrawCircle(Mosaic->gridOrigin.x, Mosaic->gridOrigin.y, 1, WHITE);
+        DrawCircle(0, 0, 1, BLACK);
+            
+            {
+                vec2 pos = GridPositionToWorldPosition(V2i(0, 0));
+                //DrawTextureEx(testTexture, {pos.x, pos.y}, 0, 0.5f, WHITE);
+                
+                pos = GridPositionToWorldPosition(V2i(4, 4));
 
+                Rectangle src = {};
+                src.x = 0;
+                src.y = 0;
+                src.width = testTexture.width;
+                src.height = testTexture.height;
+                
+                Rectangle dest = {};
+                dest.x = pos.x;
+                dest.y = pos.y;
+                dest.width = Mosaic->tileSize;
+                dest.height = Mosaic->tileSize;
+                
+                //DrawTextureEx(testTexture, {pos.x, pos.y}, 0, 0.5f, WHITE);
+                DrawTexturePro(testTexture, src, dest, Vector2{0, 0}, 0.0, WHITE);
+                //DrawTexturePro(testTexture, src, dest, Vector2{0, 0}, 0.0, WHITE);
+
+            }
+        
 
         
         EndMode2D();

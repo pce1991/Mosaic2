@@ -119,8 +119,11 @@ inline void SetTileColor(vec2 position, vec4 color) {
 vec2 GridPositionToWorldPosition(vec2i gridPosition) {
   vec2 worldPos = Mosaic->gridOrigin;
   float32 size = Mosaic->tileSize;
-  worldPos.x += (size * gridPosition.x) + (size * 0.5f);
-  worldPos.y += (-size * gridPosition.y) + (-size * 0.5f);
+  worldPos.x += (size * gridPosition.x);// + (size * 0.5f);
+  worldPos.y += (-size * gridPosition.y) + (-size);
+  
+  // @HACK: unsure about this calculation but it works
+  
   return worldPos;
 }
 
