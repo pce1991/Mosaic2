@@ -5,4 +5,4 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 @TODO: do I suppress warnings? they're super annoying
 
-
+@TODO: I want to write the compiles as python scripts I think for multiplatform. Or maybe just convert them to bash, duh
