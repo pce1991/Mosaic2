@@ -11,14 +11,16 @@ struct Ball {
 DynamicArray<Ball> balls = {};
 
 void MosaicInit() {  
-  SetMosaicGridSize(9, 9);
+  SetMosaicGridSize(192, 128);
   //Mosaic->padding = 2;
 
-  AllocateMemoryArena(&Arena, Megabytes(64));
+  // @WARNING: we dont have that much memory for web builds so
+  // allolcating 64MB is no bueno.
+  AllocateMemoryArena(&Arena, Megabytes(8));
 
-  balls = MakeDynamicArray<Ball>(&Arena, 16);
+  balls = MakeDynamicArray<Ball>(&Arena, 32);
 
-  for (int i = 0; i < 16; i++) {
+  for (int i = 0; i < 32; i++) {
     Ball ball = {};
 
     // ball.position.x = GetRandomValue(0, 9);
@@ -28,8 +30,8 @@ void MosaicInit() {
     ball.position.x = RandfRange(0, 9);
     ball.position.y = RandfRange(0, 9);
 
-    ball.velocity.x = RandfRange(0, 9);
-    ball.velocity.y = RandfRange(0, 9);
+    ball.velocity.x = RandfRange(1, 8);
+    ball.velocity.y = RandfRange(1, 8);
 #endif
 
     Print("%f %f", ball.position.x, ball.position.y);
