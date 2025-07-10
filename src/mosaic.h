@@ -22,7 +22,6 @@ struct MosaicMem {
     
 };
 
-#define PRINT_MAX_BUFFER_LEN 128
 const int32 GlyphBufferCapacity = 128;
 
 MosaicMem *Mosaic = NULL;

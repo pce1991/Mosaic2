@@ -32,18 +32,40 @@
 
 #include <math.h>
 
+#include <time.h>
+
+
+#define ASSERT(...) assert(__VA_ARGS__)
+
 
 #include "types.h"
 
 #include "memory.h"
 #include "dynamic_array.h"
 
-#include "math/vector.h"
+#include "math/math.h"
 
 
 #include "raylib.h"
 
 #include "mosaic.cpp"
+
+#define PRINT_MAX_BUFFER_LEN 1024
+
+void Print(const char *fmt, ...) {
+  char buffer[PRINT_MAX_BUFFER_LEN];
+
+  va_list args;
+  va_start (args, fmt);
+
+
+  vsnprintf(buffer, PRINT_MAX_BUFFER_LEN, fmt, args);
+
+  printf(buffer);
+  printf("\n");
+
+  va_end(args);
+}
 
 
 struct PlatformMem {
@@ -98,6 +120,9 @@ int main(void)
 
     SetMosaicGridSize(9, 9);
     Mosaic->padding = 4;
+
+    //SeedRand(1298743);
+    SeedRand(time(NULL));
 
     MosaicInit();
 
@@ -179,9 +204,10 @@ int main(void)
         
        //DrawRectangle(-300, -250, 50, 50, GRAY);
 
-        DrawCircle(Mosaic->gridOrigin.x, Mosaic->gridOrigin.y, 1, WHITE);
-        DrawCircle(0, 0, 1, BLACK);
-            
+        // DrawCircle(Mosaic->gridOrigin.x, Mosaic->gridOrigin.y, 1, WHITE);
+        // DrawCircle(0, 0, 1, BLACK);
+
+#if 0
             {
                 vec2 pos = GridPositionToWorldPosition(V2i(0, 0));
                 //DrawTextureEx(testTexture, {pos.x, pos.y}, 0, 0.5f, WHITE);
@@ -200,11 +226,9 @@ int main(void)
                 dest.width = Mosaic->tileSize;
                 dest.height = Mosaic->tileSize;
                 
-                //DrawTextureEx(testTexture, {pos.x, pos.y}, 0, 0.5f, WHITE);
                 DrawTexturePro(testTexture, src, dest, Vector2{0, 0}, 0.0, WHITE);
-                //DrawTexturePro(testTexture, src, dest, Vector2{0, 0}, 0.0, WHITE);
-
             }
+#endif
         
 
         
