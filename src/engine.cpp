@@ -36,13 +36,6 @@
 
 #include "mosaic.cpp"
 
-// I want to treat this like the platform layer. That means the user should never be
-// opening this file. Can I use a macro simply to supply the included my_game file 
-// and pass that in from the compiler like
-// #include MY_GAME_FILE
-//
-// Obviously going to need a custom compilation script that knows to compile engine
-// but can a specific game file. 
 
 struct PlatformMem {
     int32 screenWidth;

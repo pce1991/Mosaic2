@@ -1,14 +1,16 @@
 @echo off
+setlocal enabledelayedexpansion
+
 if "%~1"=="" (
-    echo Please drag a .c file onto this batch file or run it with a filename.
+    echo Please drag a .cpp file from src/ onto this batch file or run it with a filename.
     pause
     exit /b
 )
 
-echo > Setup required Environment
+::echo > Setup required Environment
 echo -------------------------------------
 
-rem === CONFIGURE YOUR ENVIRONMENT HERE ===
+:: === CONFIGURE ENVIRONMENT ===
 set "RAYLIB_PATH=C:\raylib\raylib"
 set "COMPILER_PATH=C:\raylib\w64devkit\bin"
 set "CC=g++"
@@ -16,24 +18,31 @@ set "CFLAGS=%RAYLIB_PATH%\src\raylib.rc.data -s -static -O2 -Wall -std=c++17 -I%
 set "LDFLAGS=-lraylib -lopengl32 -lgdi32 -lwinmm"
 set "PATH=%COMPILER_PATH%;%PATH%"
 
-rem === EXTRACT FILE INFO FROM ARGUMENT ===
-set "FILE_FULL=%~1"
-set "CURRENT_DIRECTORY=%~dp1"
+:: === FILE INFO ===
+set "INPUT_FULL=%~1"
+set "INPUT_DIR=%~dp1"
 set "FILE_NAME=%~nx1"
 set "NAME_PART=%~n1"
+set "SRC_DIR=src"
+set "BUILD_DIR=build"
 
-cd /d "%CURRENT_DIRECTORY%"
+:: === CREATE BUILD DIRECTORY IF NEEDED ===
+if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
 
 echo.
-echo > Clean latest build
+::echo > Clean latest build
 echo ------------------------
-if exist "%NAME_PART%.exe" del /F "%NAME_PART%.exe"
+if exist "%BUILD_DIR%\%NAME_PART%.exe" del /F "%BUILD_DIR%\%NAME_PART%.exe"
 
 echo.
-echo > Compile program
+::echo > Compile program
 echo -----------------------
 %CC% --version
-%CC% -o "%NAME_PART%.exe" "%FILE_NAME%" %CFLAGS% %LDFLAGS%
 
+:: === COMPILE ===
+%CC% -o "%BUILD_DIR%\%NAME_PART%.exe" "%INPUT_FULL%" %CFLAGS% %LDFLAGS%
 
 echo.
+echo Done. Output executable: %BUILD_DIR%\%NAME_PART%.exe
+echo.
+

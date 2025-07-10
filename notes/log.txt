@@ -2,12 +2,7 @@ DEV LOG
 
 When the file extension is changed to .cpp the makefile automatically uses g++ instead of gcc, but I doubt this is robust (like it might not work on mac).
 
-Okay going to change it so that bottom left is origin. 
 
-Could we just do:
+@TODO: do I suppress warnings? they're super annoying
 
-my_game.cpp
-  #include <engine.cpp>
-  
-  and have the engine predeclare the MyUpdate() and MyInit() functions?
-  
+
