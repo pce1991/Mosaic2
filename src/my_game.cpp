@@ -49,6 +49,11 @@ void MosaicUpdate() {
   }
 
   for (int i = 0; i < balls.count; i++) {
+    Ball *ball = &balls[i];
+    ball->position = ball->position + ball->velocity * DeltaTime;
+  }
+
+  for (int i = 0; i < balls.count; i++) {
     Ball ball = balls[i];
     SetTileColor(ball.position.x, ball.position.y, 0.8f, 0.4f, 0.6f);
   }
