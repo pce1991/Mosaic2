@@ -12,3 +12,5 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 @TODO: for easy itch building needs to be index.html
+
+@BUG: web builds cant load textures
