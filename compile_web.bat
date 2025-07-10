@@ -40,7 +40,9 @@ echo %PYTHON_PATH%
 ::exit /b
 
 ::=== COMPILE TO BUILD DIR ===
-"%CC%" -o "%BUILD_DIR%\%NAME_PART%.html" "%INPUT_FULL%" %CFLAGS% %LDFLAGS% %LDLIBS% %RESOURCES%
+call "%CC%" -o "%BUILD_DIR%\%NAME_PART%.html" "%INPUT_FULL%" %CFLAGS% %LDFLAGS% %LDLIBS% %RESOURCES%
 
-pause
+copy "%BUILD_DIR%\%NAME_PART%.html" "%BUILD_DIR%\index.html"
+
+::pause
 
