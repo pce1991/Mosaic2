@@ -28,8 +28,17 @@
 #include <stdio.h>
 #include <stdarg.h> 
 #include <string.h>
+#include <cassert>
 
 #include <math.h>
+
+
+#include "types.h"
+
+#include "memory.h"
+#include "dynamic_array.h"
+
+#include "math/vector.h"
 
 
 #include "raylib.h"

@@ -1,7 +1,4 @@
 
-#include "types.h"
-#include "math/vector.h"
-
 #include "mosaic.h"
 
 void SetMosaicGridSize(uint32 newWidth, uint32 newHeight);
