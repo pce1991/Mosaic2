@@ -16,4 +16,5 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 @BUG: web builds cant load textures
 
 
-@TODO: random generation really is super busted
+@TODO: for emmscripten try this to allow more memory -s INITIAL_MEMORY=64MB
+

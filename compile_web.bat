@@ -29,7 +29,7 @@ set "DATA_DIR=data"
 :: === COMPILER OPTIONS ===
 set "CC=%EMSCRIPTEN_PATH%\emcc"
 set "CFLAGS=-Wall -D_DEFAULT_SOURCE -Wno-missing-braces -Wunused-result -O3 -I. -I%RAYLIB_PATH%\src -I%RAYLIB_PATH%\external -DPLATFORM_WEB --preload-file %DATA_DIR%"
-set "LDFLAGS=-L. -L%RAYLIB_PATH%\src -sUSE_GLFW=3 -sEXPORTED_RUNTIME_METHODS=ccall -sASYNCIFY --shell-file data\web\shell.html"
+set "LDFLAGS=-L. -L%RAYLIB_PATH%\src -sUSE_GLFW=3 -sEXPORTED_RUNTIME_METHODS=ccall -sASYNCIFY -s INITIAL_MEMORY=64MB --shell-file data\web\shell.html"
 set "LDLIBS=%RAYLIB_PATH%\src\libraylib.web.a"
 set "RESOURCES="
 
