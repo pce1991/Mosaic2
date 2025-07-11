@@ -12,8 +12,13 @@ struct Ball {
 
 DynamicArray<Ball> balls = {};
 
-void MosaicInit() {  
-  SetMosaicGridSize(192, 128);
+
+Texture2D testTexture = {};
+
+void MosaicInit() {
+  testTexture = LoadTexture("data/glube.png");
+  
+  SetMosaicGridSize(64, 48);
   //Mosaic->padding = 2;
 
   // @WARNING: we dont have that much memory for web builds so
@@ -21,8 +26,6 @@ void MosaicInit() {
   AllocateMemoryArena(&Arena, Megabytes(8));
 
   balls = MakeDynamicArray<Ball>(&Arena, 256);
-
-  
 }
 
 void MosaicUpdate() {
@@ -76,6 +79,7 @@ void MosaicUpdate() {
     Ball ball = balls[i];
     //SetTileColor(ball.position.x, ball.position.y, 0.8f, 0.4f, 0.6f);
     SetTileColor(ball.position.x, ball.position.y, ball.color.r, ball.color.g, ball.color.b);
+    SetTileSprite(ball.position.x, ball.position.y, &testTexture);
   }
         
   //SetTileColor(10, 10, 0.8f, 0.4f, 0.6f);

@@ -83,7 +83,6 @@ float32 Time = 0;
 float32 DeltaTime = 0;
 
 
-Texture2D testTexture = {};
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -115,7 +114,7 @@ int main(void)
     
   // @TODO: maybe I should just change the tile size to be 10 by default so that 
     
-  testTexture = LoadTexture("data/test.png");        // Texture loading
+  //testTexture = LoadTexture("data/test.png");        // Texture loading
 
 
   SetMosaicGridSize(9, 9);
@@ -170,7 +169,8 @@ int main(void)
 
       //DrawText("MOSAIC", 190, 200, 40, WHITE);
         
-        
+
+      MosaicInternalUpdate();
       MosaicUpdate();
         
 
@@ -181,8 +181,33 @@ int main(void)
 
       {
         MTile *tiles = Mosaic->tiles;
+        vec2 pos;
+        
         for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
-          DrawTile(tiles[i].position, tiles[i].color);
+          MTile *tile = &Mosaic->tiles[i];
+          
+          DrawTile(tile->position, tile->color);
+
+#if 1
+          if (tile->sprite != NULL) {
+            Texture2D *sprite = tile->sprite;
+            pos = GridPositionToWorldPosition(tile->position);
+
+            Rectangle src = {};
+            src.x = 0;
+            src.y = 0;
+            src.width = sprite->width;
+            src.height = sprite->height;
+                
+            Rectangle dest = {};
+            dest.x = pos.x;
+            dest.y = pos.y;
+            dest.width = Mosaic->tileSize;
+            dest.height = Mosaic->tileSize;
+                
+            DrawTexturePro(*sprite, src, dest, Vector2{0, 0}, 0.0, WHITE);
+          }
+#endif
         }
       }
 

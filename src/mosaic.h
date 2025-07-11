@@ -1,9 +1,11 @@
 
 struct MTile{
-    // This is kinda redundant because the tile can't move, but it's easier to have a tile
-    // and know where it is than pass it's position around. 
-    vec2i position;
-    vec4 color;
+  // This is kinda redundant because the tile can't move, but it's easier to have a tile
+  // and know where it is than pass it's position around. 
+  vec2i position;
+  vec4 color;
+  
+  Texture2D *sprite;
 };
 
 

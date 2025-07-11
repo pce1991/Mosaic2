@@ -4,13 +4,13 @@
 void SetMosaicGridSize(uint32 newWidth, uint32 newHeight);
 
 void MosaicInternalInit() {
-    Mosaic = (MosaicMem *)malloc(sizeof(MosaicMem));
-    memset(Mosaic, 0, sizeof(MosaicMem));
+  Mosaic = (MosaicMem *)malloc(sizeof(MosaicMem));
+  memset(Mosaic, 0, sizeof(MosaicMem));
     
-    Mosaic->tileSize = 10;
+  Mosaic->tileSize = 10;
 
     
-    SetMosaicGridSize(16, 16);
+  SetMosaicGridSize(16, 16);
 }
     
     
@@ -43,47 +43,54 @@ inline void SetTileColor(int32 x, int32 y, vec4 color) {
   }
 }
 
+inline void SetTileSprite(int32 x, int32 y, Texture2D *sprite) {
+  MTile*t = GetTile(x, y);
+  if (t) {
+    t->sprite = sprite;
+  }
+}
+
 void SetMosaicGridSize(uint32 newWidth, uint32 newHeight) {
-    // @TODO: clamp
-    Mosaic->gridWidth = newWidth;
-    Mosaic->gridHeight = newHeight;
+  // @TODO: clamp
+  Mosaic->gridWidth = newWidth;
+  Mosaic->gridHeight = newHeight;
 
-    if (Mosaic->tiles != NULL) {
-        free(Mosaic->tiles);
+  if (Mosaic->tiles != NULL) {
+    free(Mosaic->tiles);
+  }
+    
+  Mosaic->tileCapacity = Mosaic->gridWidth * Mosaic->gridHeight;
+  Mosaic->tiles = (MTile*)malloc(sizeof(MTile) * Mosaic->tileCapacity);
+
+  memset(Mosaic->tiles, 0, Mosaic->tileCapacity * sizeof(MTile));
+
+  float32 levelAspect = Mosaic->gridWidth / (Mosaic->gridHeight * 1.0f);
+    
+  Mosaic->padding = 2;
+    
+  float32 screenAspect = 16.0 / 9.0f;
+  // @HARDCODED
+
+
+  // @TODO: add the line sizes
+  Mosaic->gridSize.x = Mosaic->tileSize * Mosaic->gridWidth;
+  Mosaic->gridSize.y = Mosaic->tileSize * Mosaic->gridHeight;
+    
+  // @TODO: because we're not in 3D our grid origin needs to get shifted from the top left.
+  // OR maybe we should just put ourselves in 3D, idk? 
+  // Or we can begin a 2D camera pass, that's probably better, and we don't have to care about
+  // screen dimensions. 
+  Mosaic->gridOrigin = V2(0) + V2(-Mosaic->gridSize.x * 0.5f, Mosaic->gridSize.y * 0.5f);
+
+  //AllocateRectBuffer(Mosaic->gridWidth * Mosaic->gridHeight, &Mosaic->rectBuffer);
+
+  MTile*tiles = Mosaic->tiles;
+  for (int y = 0; y < Mosaic->gridHeight; y++) {
+    for (int x = 0; x < Mosaic->gridWidth; x++) {
+      MTile*tile = GetTile(x, y);
+      tile->position = V2i(x, y);
     }
-    
-    Mosaic->tileCapacity = Mosaic->gridWidth * Mosaic->gridHeight;
-    Mosaic->tiles = (MTile*)malloc(sizeof(MTile) * Mosaic->tileCapacity);
-
-    memset(Mosaic->tiles, 0, Mosaic->tileCapacity * sizeof(MTile));
-
-    float32 levelAspect = Mosaic->gridWidth / (Mosaic->gridHeight * 1.0f);
-    
-    Mosaic->padding = 2;
-    
-    float32 screenAspect = 16.0 / 9.0f;
-    // @HARDCODED
-
-
-    // @TODO: add the line sizes
-    Mosaic->gridSize.x = Mosaic->tileSize * Mosaic->gridWidth;
-    Mosaic->gridSize.y = Mosaic->tileSize * Mosaic->gridHeight;
-    
-    // @TODO: because we're not in 3D our grid origin needs to get shifted from the top left.
-    // OR maybe we should just put ourselves in 3D, idk? 
-    // Or we can begin a 2D camera pass, that's probably better, and we don't have to care about
-    // screen dimensions. 
-    Mosaic->gridOrigin = V2(0) + V2(-Mosaic->gridSize.x * 0.5f, Mosaic->gridSize.y * 0.5f);
-
-    //AllocateRectBuffer(Mosaic->gridWidth * Mosaic->gridHeight, &Mosaic->rectBuffer);
-
-    MTile*tiles = Mosaic->tiles;
-    for (int y = 0; y < Mosaic->gridHeight; y++) {
-        for (int x = 0; x < Mosaic->gridWidth; x++) {
-            MTile*tile = GetTile(x, y);
-            tile->position = V2i(x, y);
-        }
-    }
+  }
 }
 
 
@@ -111,7 +118,7 @@ inline void SetTileColor(vec2 position, vec4 color) {
 }
 /*
 
-*/
+ */
 
 vec2 GridPositionToWorldPosition(vec2i gridPosition) {
   vec2 worldPos = Mosaic->gridOrigin;
@@ -127,11 +134,11 @@ vec2 GridPositionToWorldPosition(vec2i gridPosition) {
 void DrawTile(vec2i position, vec4 color) {
   vec2 worldPos = GridPositionToWorldPosition(position);
   
- Color c = {};
- c.r = color.r * 255;
- c.b = color.b * 255;
- c.g = color.g * 255;
- c.a = color.a * 255;
+  Color c = {};
+  c.r = color.r * 255;
+  c.b = color.b * 255;
+  c.g = color.g * 255;
+  c.a = color.a * 255;
 
   // this is a Raylib function. I think it should get implemented there.
   // @TODO: need to convert the vec4 color to raylib's Color struct
@@ -144,12 +151,12 @@ void DrawTile(vec2i position, vec4 color) {
 }
 
 void DrawTile(vec2i position, vec3 color) {
-   DrawTile(position, V4(color.r, color.g, color.b, 1.0f));
+  DrawTile(position, V4(color.r, color.g, color.b, 1.0f));
 }
 
 /*
 
-void DrawTextTop(vec4 color, const char *fmt, ...) {
+  void DrawTextTop(vec4 color, const char *fmt, ...) {
   va_list args;
   va_start (args, fmt);
 
@@ -160,9 +167,9 @@ void DrawTextTop(vec4 color, const char *fmt, ...) {
   DrawText(&Game->monoFont, position, 0.35f, color, true, str);
 
   va_end(args);
-}
+  }
 
-void DrawTextTop(vec4 color, float32 scale, const char *fmt, ...) {
+  void DrawTextTop(vec4 color, float32 scale, const char *fmt, ...) {
   va_list args;
   va_start (args, fmt);
 
@@ -173,9 +180,9 @@ void DrawTextTop(vec4 color, float32 scale, const char *fmt, ...) {
   DrawText(&Game->monoFont, position, 0.35f * scale, color, true, str);
 
   va_end(args);
-}
+  }
 
-void DrawTextTile(vec2 pos, float32 size, vec4 color, const char *fmt, ...) {
+  void DrawTextTile(vec2 pos, float32 size, vec4 color, const char *fmt, ...) {
   va_list args;
   va_start (args, fmt);
 
@@ -188,9 +195,9 @@ void DrawTextTile(vec2 pos, float32 size, vec4 color, const char *fmt, ...) {
   DrawText(&Game->monoFont, position, size, color, false, str);
 
   va_end(args);
-}
+  }
 
-void DrawTextTile(vec2 pos, float32 size, vec4 color, bool center, const char *fmt, ...) {
+  void DrawTextTile(vec2 pos, float32 size, vec4 color, bool center, const char *fmt, ...) {
   va_list args;
   va_start (args, fmt);
 
@@ -203,7 +210,17 @@ void DrawTextTile(vec2 pos, float32 size, vec4 color, bool center, const char *f
   DrawText(&Game->monoFont, position, size, color, center, str);
 
   va_end(args);
-}
+  }
 
 */
 
+void MosaicInternalUpdate() {
+  MTile *tiles = Mosaic->tiles;
+
+  for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
+    MTile *tile = &Mosaic->tiles[i];
+
+    tile->color = V4(0, 0, 0, 1);
+    tile->sprite = NULL;
+  }
+}
