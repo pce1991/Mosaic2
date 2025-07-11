@@ -18,3 +18,9 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 @TODO: for emmscripten try this to allow more memory -s INITIAL_MEMORY=64MB
 
+
+
+- @TODO: for input I guess I can just use Raylib's functions. But I kinda prefer IsPressed(device) to IsDevicePressed...
+  It just feels a bit dumb to write wrapper and a mapping between our specific type...
+
+  One reason I like passing devices more is its a better mapping to an action system
