@@ -30,7 +30,7 @@ void MosaicInit() {
 
 void MosaicUpdate() {
 
-  if (IsKeyPressed(KEY_SPACE)) {
+  if (InputPressed(Engine.keyboard, Input_Space)) {
     for (int i = 0; i < 8; i++) {
       Ball ball = {};
 

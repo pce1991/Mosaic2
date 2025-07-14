@@ -39,18 +39,61 @@ void PushInputEvent(InputManager *input, InputEvent e) {
   PushBack(&input->events, e);
 }
 
+bool InputPressed(InputDevice *device, int32 inputID) {
+  return device->pressed[inputID] && device->framesHeld[inputID] == 0;
+}
+
+bool InputReleased(InputDevice *device, int32 inputID) {
+  return device->released[inputID];
+}
+
+bool InputHeld(InputDevice *device, int32 inputID) {
+  return device->framesHeld[inputID] > 0;
+}
+
+bool InputHeldSeconds(InputDevice *device, int32 inputID, float32 time) {
+  bool held = device->framesHeld[inputID] > 0;
+
+  return held && (Time - device->timePressed[inputID] >= time);
+}
+
+
 void RaylibPushKeyboardEvents(InputManager *input, InputDevice *device) {
   int32 key = GetKeyPressed();
-  
+
+  // @TODO: I think we need to just iterate over all the keys on Raylib...
+
+  for (int key = 0; key < KEY_KP_EQUAL; key++) {
+    InputEvent event = {};
+    event.device = device;
+
+    if (key >= ArrayLength(uint32, KeyTypeMap)) {
+      continue;
+    }
+    
+    event.index = KeyTypeMap[key];
+
+    if (IsKeyPressed(key) ||
+        IsKeyDown(key)) {
+      event.discreteValue = true;
+    }
+    else if (IsKeyReleased(key)) {
+
+    }
+    else {
+      continue;
+    }
+
+    //Print("raylib key %d mapped to %d / %d", key, event.index, device->discreteCount);
+
+    PushInputEvent(input, event);
+  }
+
+#if 0
   while (key != 0) {
     InputEvent event = {};
 
     event.device = device;
-
-    if (key >= ArrayLength(uint32, KeyTypeMap)) {
-      key = GetKeyPressed();
-      continue;
-    }
 
     // map from raylib's key to ours
     event.index = KeyTypeMap[key];
@@ -63,6 +106,7 @@ void RaylibPushKeyboardEvents(InputManager *input, InputDevice *device) {
 
     PushInputEvent(input, event);
   }
+#endif
 }
 
 void InputManagerUpdate(InputManager *input) {
@@ -73,12 +117,19 @@ void InputManagerUpdate(InputManager *input) {
 
     // clear the device
     for (int i = 0; i < device->discreteCount; i++) {
-      device->released[i] = false;
+
+      if (device->pressed[i]) {
+        device->released[i] = true;
+      }
+      else {
+        device->released[i] = false;
+      }
             
       // @NOTE: until we get a release event we consider a key to be pressed
       if (device->framesHeld[i] >= 0) {
         device->framesHeld[i]++;
         device->pressed[i] = false;
+        device->released[i] = false;
       }
     }
 
@@ -106,7 +157,7 @@ void InputManagerUpdate(InputManager *input) {
       }
       else {
         if (device->framesHeld[index] < 0) {
-          Print("pressed\n");
+          //Print("pressed\n");
 
           device->timePressed[index] = Time;
           device->framesHeld[index] = 0;
