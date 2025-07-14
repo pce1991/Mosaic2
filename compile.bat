@@ -14,7 +14,7 @@ echo -------------------------------------
 set "RAYLIB_PATH=C:\raylib\raylib"
 set "COMPILER_PATH=C:\raylib\w64devkit\bin"
 set "CC=g++"
-set "CFLAGS=%RAYLIB_PATH%\src\raylib.rc.data -s -static -O2 -Wall -std=c++17 -I%RAYLIB_PATH%\src -Iexternal -DPLATFORM_DESKTOP"
+set "CFLAGS=%RAYLIB_PATH%\src\raylib.rc.data -s -static -O2 -std=c++20 -I%RAYLIB_PATH%\src -Iexternal -DPLATFORM_DESKTOP"
 set "LDFLAGS=-lraylib -lopengl32 -lgdi32 -lwinmm"
 set "PATH=%COMPILER_PATH%;%PATH%"
 

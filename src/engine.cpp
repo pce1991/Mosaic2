@@ -40,15 +40,11 @@
 
 #include "types.h"
 
-#include "memory.h"
-#include "dynamic_array.h"
-
-#include "math/math.h"
 
 
-#include "raylib.h"
+float32 Time = 0;
+float32 DeltaTime = 0;
 
-#include "mosaic.cpp"
 
 #define PRINT_MAX_BUFFER_LEN 1024
 
@@ -68,6 +64,21 @@ void Print(const char *fmt, ...) {
 }
 
 
+#include "memory.h"
+#include "dynamic_array.h"
+
+#include "math/math.h"
+
+#include "common.h"
+
+#include "raylib.h"
+
+#include "input.h"
+#include "input.cpp"
+
+#include "mosaic.cpp"
+
+
 struct PlatformMem {
   int32 screenWidth;
   int32 screenHeight;
@@ -79,10 +90,16 @@ void MosaicInit();
 void MosaicUpdate();
 
 
-float32 Time = 0;
-float32 DeltaTime = 0;
+struct EngineMem {
+  InputDevice *keyboard;
+  InputDevice *mouse;
 
+  MemoryArena arena;
 
+  InputManager input;
+};
+
+EngineMem Engine = {};
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -92,17 +109,34 @@ int main(void)
 
   // Initialization
   //--------------------------------------------------------------------------------------
-  Platform.screenWidth = 3200;
-  Platform.screenHeight = 1800;
+  Platform.screenWidth = 1600;
+  Platform.screenHeight = 900;
 
   InitWindow(Platform.screenWidth, Platform.screenHeight, "raylib [core] example - basic window");
+
+  AllocateMemoryArena(&Engine.arena, Megabytes(1));
+  
+  {
+    InputManager *input = &Engine.input;
+
+    // 4 controllers + mouse & keyboard
+    AllocateInputManager(input, &Engine.arena, 32, 6);
+
+    AllocateInputDevice(&input->devices[0], InputDeviceType_Keyboard, Input_KeyCount, 0);
+    //AllocateInputDevice(&input->devices[1], InputDeviceType_Mouse, MouseButton_Count, MouseAnalogue_Count);
+
+    Engine.keyboard = &input->devices[0];
+    Engine.mouse = &input->devices[1];
+  }
 
   SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
     
   Camera2D camera = { 0 };
-  camera.target = (Vector2){ 0, 0};
-  camera.offset = (Vector2){ Platform.screenWidth/2.0f, Platform.screenHeight/2.0f };
+  camera.target.x = 0;
+  camera.target.y = 0;
+  camera.offset.x = Platform.screenWidth/2.0f;
+  camera.offset.y = Platform.screenHeight/2.0f;;
   camera.rotation = 0.0f;
   camera.zoom = 16.0f;
 
@@ -126,146 +160,154 @@ int main(void)
   MosaicInit();
 
   // Main game loop
-  while (!WindowShouldClose())    // Detect window close button or ESC key
+  while (!WindowShouldClose()) {
+    Time = GetTime();
+    DeltaTime = GetFrameTime();
+
     {
-      Time = GetTime();
-      DeltaTime = GetFrameTime();
-        
-      // @HACK: just do this when the grid resizes in Mosaic     
-      {
-        float32 levelAspect = Mosaic->gridWidth / Mosaic->gridHeight;
-        float32 screenAspect = Platform.screenWidth / (1.0f * Platform.screenHeight);
-        
-        float32 size = 1;
-        
-        if (levelAspect > screenAspect) {
-          size = Mosaic->gridWidth / (16.0f - Mosaic->padding);
-           
-          size = Platform.screenWidth / (1.0f * (Mosaic->gridWidth + (2 * Mosaic->padding)));
+      InputManager *input = &Engine.input;
+      DynamicArrayClear(&input->events);
+    
+      RaylibPushKeyboardEvents(input, Engine.keyboard);
 
-        }
-        else {
-          size = Mosaic->gridHeight / (9.0f - Mosaic->padding);
-           
-          size = Platform.screenHeight / (1.0f * (Mosaic->gridHeight + (2 * Mosaic->padding)));
-
-        }
+      InputManagerUpdate(input);
+    }
         
-        camera.zoom = size / Mosaic->tileSize;
+    // @HACK: just do this when the grid resizes in Mosaic     
+    {
+      float32 levelAspect = Mosaic->gridWidth / Mosaic->gridHeight;
+      float32 screenAspect = Platform.screenWidth / (1.0f * Platform.screenHeight);
+        
+      float32 size = 1;
+        
+      if (levelAspect > screenAspect) {
+        size = Mosaic->gridWidth / (16.0f - Mosaic->padding);
+           
+        size = Platform.screenWidth / (1.0f * (Mosaic->gridWidth + (2 * Mosaic->padding)));
+
       }
+      else {
+        size = Mosaic->gridHeight / (9.0f - Mosaic->padding);
+           
+        size = Platform.screenHeight / (1.0f * (Mosaic->gridHeight + (2 * Mosaic->padding)));
+
+      }
+        
+      camera.zoom = size / Mosaic->tileSize;
+    }
     
 
 
-      // Update
-      //----------------------------------------------------------------------------------
-      // TODO: Update your variables here
-      //----------------------------------------------------------------------------------
+    // Update
+    //----------------------------------------------------------------------------------
+    // TODO: Update your variables here
+    //----------------------------------------------------------------------------------
 
-      // Draw
-      //----------------------------------------------------------------------------------
-      BeginDrawing();
+    // Draw
+    //----------------------------------------------------------------------------------
+    BeginDrawing();
 
-      ClearBackground(BLACK);
+    ClearBackground(BLACK);
 
-      //DrawText("MOSAIC", 190, 200, 40, WHITE);
+    //DrawText("MOSAIC", 190, 200, 40, WHITE);
         
 
-      MosaicInternalUpdate();
-      MosaicUpdate();
+    MosaicInternalUpdate();
+    MosaicUpdate();
         
 
-      // @TODO: Mosaic should be accumulating a list of draw text commands 
-      // which we iterate and call the correct stuff for
+    // @TODO: Mosaic should be accumulating a list of draw text commands 
+    // which we iterate and call the correct stuff for
         
-      BeginMode2D(camera);
+    BeginMode2D(camera);
 
-      {
-        MTile *tiles = Mosaic->tiles;
-        vec2 pos;
+    {
+      MTile *tiles = Mosaic->tiles;
+      vec2 pos;
         
-        for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
-          MTile *tile = &Mosaic->tiles[i];
+      for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
+        MTile *tile = &Mosaic->tiles[i];
           
-          DrawTile(tile->position, tile->color);
+        DrawTile(tile->position, tile->color);
 
 #if 1
-          if (tile->sprite != NULL) {
-            Texture2D *sprite = tile->sprite;
-            pos = GridPositionToWorldPosition(tile->position);
+        if (tile->sprite != NULL) {
+          Texture2D *sprite = tile->sprite;
+          pos = GridPositionToWorldPosition(tile->position);
 
-            Rectangle src = {};
-            src.x = 0;
-            src.y = 0;
-            src.width = sprite->width;
-            src.height = sprite->height;
+          Rectangle src = {};
+          src.x = 0;
+          src.y = 0;
+          src.width = sprite->width;
+          src.height = sprite->height;
                 
-            Rectangle dest = {};
-            dest.x = pos.x;
-            dest.y = pos.y;
-            dest.width = Mosaic->tileSize;
-            dest.height = Mosaic->tileSize;
+          Rectangle dest = {};
+          dest.x = pos.x;
+          dest.y = pos.y;
+          dest.width = Mosaic->tileSize;
+          dest.height = Mosaic->tileSize;
                 
-            DrawTexturePro(*sprite, src, dest, Vector2{0, 0}, 0.0, WHITE);
-          }
-#endif
+          DrawTexturePro(*sprite, src, dest, Vector2{0, 0}, 0.0, WHITE);
         }
+#endif
       }
+    }
 
-      //DrawTile(V2i(0, 0), V3(1, 1, 1));
-      //DrawTile(V2i(Mosaic->gridWidth - 1, 0), V3(0, 0, 1));
-      //DrawTile(V2i(Mosaic->gridWidth - 1, Mosaic->gridHeight - 1), V3(1, 0, 0));
+    //DrawTile(V2i(0, 0), V3(1, 1, 1));
+    //DrawTile(V2i(Mosaic->gridWidth - 1, 0), V3(0, 0, 1));
+    //DrawTile(V2i(Mosaic->gridWidth - 1, Mosaic->gridHeight - 1), V3(1, 0, 0));
 
         
-      //printf("orig %d %d\n", Mosaic->gridOrigin.x, Mosaic->gridOrigin.y);
+    //printf("orig %d %d\n", Mosaic->gridOrigin.x, Mosaic->gridOrigin.y);
 
-      //SetTileColor();
+    //SetTileColor();
         
-      // hmm frustrating that a text size of 1 isn't the same as a tile...
-      // looks like the default size is 10, and since we just take an integer gonna need to 
-      // generate a new font...
-      //DrawText("MOSAIC", 0, 0, 40, WHITE);
+    // hmm frustrating that a text size of 1 isn't the same as a tile...
+    // looks like the default size is 10, and since we just take an integer gonna need to 
+    // generate a new font...
+    //DrawText("MOSAIC", 0, 0, 40, WHITE);
        
-      //DrawRectangle(0, 0, 50, 50, GRAY);
+    //DrawRectangle(0, 0, 50, 50, GRAY);
         
-      //DrawRectangle(-300, -250, 50, 50, GRAY);
+    //DrawRectangle(-300, -250, 50, 50, GRAY);
 
-      // DrawCircle(Mosaic->gridOrigin.x, Mosaic->gridOrigin.y, 1, WHITE);
-      // DrawCircle(0, 0, 1, BLACK);
+    // DrawCircle(Mosaic->gridOrigin.x, Mosaic->gridOrigin.y, 1, WHITE);
+    // DrawCircle(0, 0, 1, BLACK);
 
 #if 0
-      {
-        vec2 pos = GridPositionToWorldPosition(V2i(0, 0));
-        //DrawTextureEx(testTexture, {pos.x, pos.y}, 0, 0.5f, WHITE);
+    {
+      vec2 pos = GridPositionToWorldPosition(V2i(0, 0));
+      //DrawTextureEx(testTexture, {pos.x, pos.y}, 0, 0.5f, WHITE);
                 
-        pos = GridPositionToWorldPosition(V2i(4, 4));
+      pos = GridPositionToWorldPosition(V2i(4, 4));
 
-        Rectangle src = {};
-        src.x = 0;
-        src.y = 0;
-        src.width = testTexture.width;
-        src.height = testTexture.height;
+      Rectangle src = {};
+      src.x = 0;
+      src.y = 0;
+      src.width = testTexture.width;
+      src.height = testTexture.height;
                 
-        Rectangle dest = {};
-        dest.x = pos.x;
-        dest.y = pos.y;
-        dest.width = Mosaic->tileSize;
-        dest.height = Mosaic->tileSize;
+      Rectangle dest = {};
+      dest.x = pos.x;
+      dest.y = pos.y;
+      dest.width = Mosaic->tileSize;
+      dest.height = Mosaic->tileSize;
                 
-        DrawTexturePro(testTexture, src, dest, Vector2{0, 0}, 0.0, WHITE);
-      }
+      DrawTexturePro(testTexture, src, dest, Vector2{0, 0}, 0.0, WHITE);
+    }
 #endif
         
 
         
-      EndMode2D();
+    EndMode2D();
         
                 
-      DrawFPS(10, 10);
+    DrawFPS(10, 10);
 
 
-      EndDrawing();
-      //----------------------------------------------------------------------------------
-    }
+    EndDrawing();
+    //----------------------------------------------------------------------------------
+  }
 
   // De-Initialization
   //--------------------------------------------------------------------------------------

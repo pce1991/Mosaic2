@@ -24,3 +24,15 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
   It just feels a bit dumb to write wrapper and a mapping between our specific type...
 
   One reason I like passing devices more is its a better mapping to an action system
+
+  Change it to InputMouseDiscrete or maybe just append all with Input_MouseLeft....
+
+  I'd kinda rather have MouseButton_Left than Input_MouseLeft as an API, but raylib has already defined MouseButton...
+
+
+
+- @TODO: UGH so if I want to get VS pdb files we have to build differently, which makes sense obvioussly. So now I need to look into how to compile raylib with MSVC instead of cmake
+
+  @TODO: I think I also need to have a way to make sure that students know they must build raylib at least once right?
+
+
