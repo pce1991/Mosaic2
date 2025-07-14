@@ -242,6 +242,8 @@ int main(void)
         
     BeginMode2D(camera);
 
+    BeginBlendMode(1);
+
     {
       MTile *tiles = Mosaic->tiles;
       vec2 pos;
@@ -256,23 +258,39 @@ int main(void)
           Texture2D *sprite = tile->sprite;
           pos = GridPositionToWorldPosition(tile->position);
 
+          float32 scale = 1.0f + ((1 + sinf(Time + (i * 0.5f))) / 2);
+
           Rectangle src = {};
           src.x = 0;
           src.y = 0;
-          src.width = sprite->width;
+          src.width = sprite->width ;
           src.height = sprite->height;
-                
+
           Rectangle dest = {};
-          dest.x = pos.x;
-          dest.y = pos.y;
-          dest.width = Mosaic->tileSize;
-          dest.height = Mosaic->tileSize;
+          dest.width = Mosaic->tileSize * scale;
+          dest.height = Mosaic->tileSize * scale;
+
+          vec2 origin = V2(dest.width / 2, dest.height / 2);
+
+          vec2 centerOffset = V2(Mosaic->tileSize / 2, Mosaic->tileSize / 2);
+          
+          dest.x = pos.x + centerOffset.x;
+          dest.y = pos.y + centerOffset.y;
+
+          //Print("origin %f %f", origin.x, origin.y);
                 
-          DrawTexturePro(*sprite, src, dest, Vector2{0, 0}, 0.0, WHITE);
+          DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, RED);
+
+          //DrawCircle(pos.x, pos.y, 1, WHITE);
+
+          // @BUG: 
+          //DrawCircle(dest.x, dest.y, 1, WHITE);
         }
 #endif
       }
     }
+
+    EndBlendMode();
 
     //DrawTile(V2i(0, 0), V3(1, 1, 1));
     //DrawTile(V2i(Mosaic->gridWidth - 1, 0), V3(0, 0, 1));

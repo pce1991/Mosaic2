@@ -60,72 +60,14 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
   I dont love that we have to explicity make it...
 
-  - If I dont want to that I believe I can do this:
+  - what if we just compile it from the command line each time?
 
-@echo off
-setlocal enabledelayedexpansion
-
-:: Check if input file is provided
-if "%~1"=="" (
-    echo Please drag a .cpp file onto this script or provide a path to your source file.
-    pause
-    exit /b
-)
-
-:: === Setup Paths ===
-set "INPUT_FULL=%~1"
-set "NAME_PART=%~n1"
-set "BUILD_DIR=build"
-
-:: Path to raylib (edit this if your raylib path differs)
-set "RAYLIB_PATH=C:\raylib\raylib"
-set "RAYLIB_SRC=%RAYLIB_PATH%\src"
-set "RAYLIB_INC=%RAYLIB_SRC%"
-
-:: === Create build output directory ===
-if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
-
-:: === List of raylib .c source files ===
-set SOURCES=
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rcore.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rlgl.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rshapes.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rtextures.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rtext.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rmodels.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\utils.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\raudio.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rglfw.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rgestures.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\raymath.c"
-set SOURCES=%SOURCES% "%RAYLIB_SRC%\rcamera.c"
-
-:: === Clean old build ===
-if exist "%BUILD_DIR%\%NAME_PART%.exe" del /F "%BUILD_DIR%\%NAME_PART%.exe"
-if exist "%BUILD_DIR%\%NAME_PART%.pdb" del /F "%BUILD_DIR%\%NAME_PART%.pdb"
-
-:: === Build command ===
-echo.
-echo Compiling with MSVC...
-echo.
-
-cl.exe /EHsc /Zi /std:c++20 /MDd ^
-    "%INPUT_FULL%" %SOURCES% ^
-    /I"%RAYLIB_INC%" /I"external" ^
-    /Fe"%BUILD_DIR%\%NAME_PART%.exe" ^
-    /Fd"%BUILD_DIR%\%NAME_PART%.pdb" ^
-    /link ^
-    opengl32.lib gdi32.lib winmm.lib ^
-    user32.lib shell32.lib setupapi.lib ole32.lib advapi32.lib ^
-    /DEBUG
-
-echo.
-echo Build complete.
-echo Output EXE:  %BUILD_DIR%\%NAME_PART%.exe
-echo Output PDB:  %BUILD_DIR%\%NAME_PART%.pdb
-echo.
-pause
+  @TODO: what if we provide a pre-compiled lib they can link against?
 
 
 @HACK: kinda hacky to not be using events for the mouse, but whatever for right now...
 
+
+@BUG: running project thru VS doesnt load the texture (I assume cause of a working directory thing?)
+
+@TODO: it seems like I might be able to do the alphablending that I want???

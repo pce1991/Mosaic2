@@ -22,7 +22,7 @@ set "BUILD_DIR=build"
 set "RAYLIB_PATH=C:\raylib\raylib"
 set "RAYLIB_INCLUDE=%RAYLIB_PATH%\src"
 set "RAYLIB_LIB=C:\raylib\raylib\build_msvc\raylib"
-::set "RAYLIB_LIB=%RAYLIB_PATH%\src"
+::set "RAYLIB_LIB=.\lib"
 
 :: === CREATE BUILD DIRECTORY IF NEEDED ===
 if not exist "%BUILD_DIR%" mkdir "%BUILD_DIR%"
