@@ -1,0 +1,30 @@
+# raylib Makefile for MSVC (Visual Studio)
+# Place this file in raylib/src and run: nmake -f Makefile.msvc
+
+# Compiler and flags
+CC = cl
+AR = lib
+CFLAGS = /nologo /std:c++20 /Zi /EHsc /MDd /DPLATFORM_DESKTOP /D_CRT_SECURE_NO_WARNINGS /I. /Iexternal
+LDFLAGS = user32.lib shell32.lib gdi32.lib winmm.lib
+
+# Output files
+OUTLIB = raylib.lib
+OUTOBJ = rcore.obj rshapes.obj rtext.obj rtextures.obj utils.obj raudio.obj rmodels.obj rlgl.obj
+
+# Source files
+SRC = rcore.c rshapes.c rtext.c rtextures.c utils.c raudio.c rmodels.c rlgl.c
+
+# Default target
+all: $(OUTLIB)
+
+# Object file build rule
+.c.obj:
+	$(CC) $(CFLAGS) /c $< /Fo$@
+
+# Build library
+$(OUTLIB): $(OUTOBJ)
+	$(AR) /nologo /OUT:$(OUTLIB) $(OUTOBJ)
+
+# Clean
+clean:
+	del /Q *.obj *.lib *.pdb
