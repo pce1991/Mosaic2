@@ -36,4 +36,30 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
   @TODO: I think I also need to have a way to make sure that students know they must build raylib at least once right?
 
 
+  ========================================
+  Install CMake (if not already): https://cmake.org/download
+
+  Open x64 Native Tools Command Prompt for VS 2022
+
+  Run the following commands:
+
+  cd C:\raylib\raylib
+  mkdir build_msvc
+  cd build_msvc
+
+  cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Debug -DSTATIC=ON -DBUILD_EXAMPLES=OFF ..
+  nmake
+
+  This will build raylib.lib and place it in build_msvc\.
+
+  Your .bat file should now point to:
+
+  set "RAYLIB_LIB=C:\raylib\raylib\build_msvc\raylib"
+  ;; verify that raylib.lib is put here every time!
+  ========================================
+
+  I dont love that we have to explicity make it...
+
+
 @HACK: kinda hacky to not be using events for the mouse, but whatever for right now...
+
