@@ -57,7 +57,7 @@ void Print(const char *fmt, ...) {
 
   vsnprintf(buffer, PRINT_MAX_BUFFER_LEN, fmt, args);
 
-  printf(buffer);
+  printf("%s", buffer);
   printf("\n");
 
   va_end(args);
@@ -102,6 +102,9 @@ struct EngineMem {
   InputManager input;
 };
 
+InputDevice *Keyboard = NULL;
+InputDevice *Mouse = NULL;
+
 EngineMem Engine = {};
 
 //------------------------------------------------------------------------------------
@@ -131,6 +134,9 @@ int main(void)
 
     Engine.keyboard = &input->devices[0];
     Engine.mouse = &input->devices[1];
+
+    Keyboard = Engine.keyboard;
+    Mouse = Engine.mouse;
 
     
     SetMousePosition(Platform.screenWidth / 2,
