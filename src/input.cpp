@@ -90,6 +90,38 @@ void RaylibPushKeyboardEvents(InputManager *input, InputDevice *device) {
   }
 }
 
+void RaylibPushMouseEvents(InputManager *input, InputDevice *device) {
+  int32 key = GetKeyPressed();
+
+  // @TODO: I think we need to just iterate over all the keys on Raylib...
+
+  for (int button = 0; button < MOUSE_BUTTON_BACK; button++) {
+    InputEvent event = {};
+    event.device = device;
+
+    if (button >= ArrayLength(uint32, MouseButtonMap)) {
+      continue;
+    }
+    
+    event.index = MouseButtonMap[button];
+
+    if (IsMouseButtonPressed(button) ||
+        IsMouseButtonDown(button)) {
+      event.discreteValue = true;
+    }
+    else if (IsMouseButtonReleased(button)) {
+
+    }
+    else {
+      continue;
+    }
+
+    //Print("raylib button %d mapped to %d / %d", button, event.index, device->discreteCount);
+
+    PushInputEvent(input, event);
+  }
+}
+
 void InputManagerUpdate(InputManager *input) {
 
   for (int i = 0; i < input->deviceCount; i++) {
@@ -114,11 +146,11 @@ void InputManagerUpdate(InputManager *input) {
       
       int32 index = event.index;
         
-      Print("event %d frames %d\n", i, device->framesHeld[index]);
+      //Print("event %d frames %d\n", i, device->framesHeld[index]);
 
       InputDevice *device = event.device;
 
-      Print("device %x", device);
+      //Print("device %x", device);
 
       if (!event.discreteValue) {
         if (device->framesHeld[index] > 0) {

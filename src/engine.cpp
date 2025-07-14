@@ -123,7 +123,7 @@ int main(void)
     AllocateInputManager(input, &Engine.arena, 32, 6);
 
     AllocateInputDevice(&input->devices[0], InputDeviceType_Keyboard, Input_KeyCount, 0);
-    //AllocateInputDevice(&input->devices[1], InputDeviceType_Mouse, MouseButton_Count, MouseAnalogue_Count);
+    AllocateInputDevice(&input->devices[1], InputDeviceType_Mouse, MouseButton_Count, MouseAnalogue_Count);
 
     Engine.keyboard = &input->devices[0];
     Engine.mouse = &input->devices[1];
@@ -169,6 +169,7 @@ int main(void)
       DynamicArrayClear(&input->events);
     
       RaylibPushKeyboardEvents(input, Engine.keyboard);
+      RaylibPushMouseEvents(input, Engine.mouse);
 
       InputManagerUpdate(input);
     }

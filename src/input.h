@@ -126,7 +126,7 @@ enum InputKeyType : uint32 {
   Input_KeyCount,
 };
 
-#if 0
+#if 1
 enum InputMouseButton : uint32 {
   Input_MouseLeft,
   Input_MouseRight,
@@ -397,6 +397,13 @@ static int32 KeyTypeMap[] = {
     // VK_OEM_8...
 };
 #endif
+
+static int32 MouseButtonMap[] = {
+  Input_MouseLeft,
+  Input_MouseRight,
+  Input_MouseMiddle,
+  -1, -1, -1, -1
+};
 
 
 struct InputEvent {
