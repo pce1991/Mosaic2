@@ -279,7 +279,7 @@ int main(void)
 
           //Print("origin %f %f", origin.x, origin.y);
                 
-          DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, RED);
+          DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, BLUE);
 
           //DrawCircle(pos.x, pos.y, 1, WHITE);
 
