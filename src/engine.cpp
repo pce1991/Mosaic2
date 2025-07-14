@@ -94,6 +94,9 @@ struct EngineMem {
   InputDevice *keyboard;
   InputDevice *mouse;
 
+  vec2 mousePosition;
+  vec2 mousePositionNorm;
+
   MemoryArena arena;
 
   InputManager input;
@@ -123,10 +126,15 @@ int main(void)
     AllocateInputManager(input, &Engine.arena, 32, 6);
 
     AllocateInputDevice(&input->devices[0], InputDeviceType_Keyboard, Input_KeyCount, 0);
-    AllocateInputDevice(&input->devices[1], InputDeviceType_Mouse, MouseButton_Count, MouseAnalogue_Count);
+    AllocateInputDevice(&input->devices[1], InputDeviceType_Mouse,
+                        Input_MouseDiscreteCount, Input_MouseAnalogueCount);
 
     Engine.keyboard = &input->devices[0];
     Engine.mouse = &input->devices[1];
+
+    
+    SetMousePosition(Platform.screenWidth / 2,
+                     Platform.screenHeight / 2);
   }
 
   SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -170,6 +178,12 @@ int main(void)
     
       RaylibPushKeyboardEvents(input, Engine.keyboard);
       RaylibPushMouseEvents(input, Engine.mouse);
+
+      Engine.mousePosition.x = GetMouseX();
+      Engine.mousePosition.y = GetMouseX();
+
+      Engine.mousePositionNorm.x = Engine.mousePosition.x / (1.0f * Platform.screenWidth);
+      Engine.mousePositionNorm.y = Engine.mousePosition.y / (1.0f * Platform.screenHeight);
 
       InputManagerUpdate(input);
     }

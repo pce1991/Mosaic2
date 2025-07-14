@@ -36,3 +36,4 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
   @TODO: I think I also need to have a way to make sure that students know they must build raylib at least once right?
 
 
+@HACK: kinda hacky to not be using events for the mouse, but whatever for right now...

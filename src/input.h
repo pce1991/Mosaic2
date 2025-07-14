@@ -137,12 +137,12 @@ enum InputMouseButton : uint32 {
 
 
 enum InputMouseAnalogue : uint32 {
-  MouseAnalogue_PositionX,
-  MouseAnalogue_PositionY,
+  Input_MousePositionX,
+  Input_MousePositionY,
 
   MouseAnalogue_Scroll,
 
-  MouseAnalogue_Count,
+  Input_MouseAnalogueCount,
 };
 #endif
 

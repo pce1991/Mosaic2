@@ -30,7 +30,9 @@ void MosaicInit() {
 
 void MosaicUpdate() {
 
-  if (InputPressed(Engine.keyboard, Input_Space)) {
+  if (InputPressed(Engine.keyboard, Input_Space) ||
+      InputPressed(Engine.mouse, Input_MouseLeft) ||
+      Engine.mousePositionNorm.x > 0.5f) {
     for (int i = 0; i < 8; i++) {
       Ball ball = {};
 
