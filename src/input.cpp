@@ -88,42 +88,16 @@ void RaylibPushKeyboardEvents(InputManager *input, InputDevice *device) {
 
     PushInputEvent(input, event);
   }
-
-#if 0
-  while (key != 0) {
-    InputEvent event = {};
-
-    event.device = device;
-
-    // map from raylib's key to ours
-    event.index = KeyTypeMap[key];
-
-    Print("raylib key %d mapped to %d / %d", key, event.index, device->discreteCount);
-
-    event.discreteValue = true;
-    
-    key = GetKeyPressed();
-
-    PushInputEvent(input, event);
-  }
-#endif
 }
 
 void InputManagerUpdate(InputManager *input) {
-  //int key = GetKeyPressed(void);
 
   for (int i = 0; i < input->deviceCount; i++) {
     InputDevice *device = &input->devices[i];
 
     // clear the device
     for (int i = 0; i < device->discreteCount; i++) {
-
-      if (device->pressed[i]) {
-        device->released[i] = true;
-      }
-      else {
-        device->released[i] = false;
-      }
+      device->released[i] = false;
             
       // @NOTE: until we get a release event we consider a key to be pressed
       if (device->framesHeld[i] >= 0) {
