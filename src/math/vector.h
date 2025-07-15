@@ -871,3 +871,549 @@ inline bool operator!=(vec4i a, vec4i b) {
 
     return result;
 }
+
+
+inline float32 Dot(vec2 a, vec2 b) {
+    float32 result = a.x * b.x + a.y * b.y;
+
+    return result;
+}
+
+inline float32 Dot(vec3 a, vec3 b) {
+    float32 result = a.x * b.x + a.y * b.y + a.z * b.z;
+
+    return result;
+}
+
+inline float32 Dot(vec4 a, vec4 b) {
+    float32 result = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+
+    return result;
+}
+
+inline int32 Dot(vec2i a, vec2i b) {
+    int32 result = a.x * b.x + a.y * b.y;
+
+    return result;
+}
+
+inline int32 Dot(vec3i a, vec3i b) {
+    float32 result = a.x * b.x + a.y * b.y + a.z * b.z;
+
+    return result;
+}
+
+inline int32 Dot(vec4i a, vec4i b) {
+    float32 result = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+
+    return result;
+}
+
+inline float32 Cross(vec2 a, vec2 b) {
+    float32 result;
+
+    // This is the magnitude of the 3D cross product if a and b are
+    // assumed to be on the plane z = 0
+    result = a.y * b.x - a.x * b.y;
+
+    return result;
+}
+
+inline vec3 Cross(vec3 a, vec3 b) {
+    vec3 result;
+
+    result.x = a.y * b.z - a.z * b.y;
+    result.y = -(a.x * b.z - a.z * b.x);
+    result.z = a.x * b.y - a.y * b.x;
+
+    return result;
+}
+
+inline vec3 TripleVector(vec3 a, vec3 b, vec3 c) {
+    return Cross(Cross(a, b), c);
+}
+
+inline vec2 Clamp(vec2 a, vec2 min, vec2 max) {
+    vec2 result;
+
+    result.x = Clamp(a.x, min.x, max.x);
+    result.y = Clamp(a.y, min.y, max.y);
+
+    return result;
+}
+
+inline vec3 Clamp(vec3 a, vec3 min, vec3 max) {
+    vec3 result;
+
+    result.x = Clamp(a.x, min.x, max.x);
+    result.y = Clamp(a.y, min.y, max.y);
+    result.z = Clamp(a.z, min.z, max.z);
+
+    return result;
+}
+
+inline vec4 Clamp(vec4 a, vec4 min, vec4 max) {
+    vec4 result;
+
+    result.x = Clamp(a.x, min.x, max.x);
+    result.y = Clamp(a.y, min.y, max.y);
+    result.z = Clamp(a.z, min.z, max.z);
+    result.w = Clamp(a.w, min.w, max.w);
+
+    return result;
+}
+
+inline vec2i Clamp(vec2i a, vec2i min, vec2i max) {
+    vec2i result;
+
+    result.x = Clamp(a.x, min.x, max.x);
+    result.y = Clamp(a.y, min.y, max.y);
+
+    return result;
+}
+
+inline vec3i Clamp(vec3i a, vec3i min, vec3i max) {
+    vec3i result;
+
+    result.x = Clamp(a.x, min.x, max.x);
+    result.y = Clamp(a.y, min.y, max.y);
+    result.z = Clamp(a.z, min.z, max.z);
+
+    return result;
+}
+
+inline vec4i Clamp(vec4i a, vec4i min, vec4i max) {
+    vec4i result;
+
+    result.x = Clamp(a.x, min.x, max.x);
+    result.y = Clamp(a.y, min.y, max.y);
+    result.z = Clamp(a.z, min.z, max.z);
+    result.w = Clamp(a.w, min.w, max.w);
+
+    return result;
+}
+
+inline vec2 Min(vec2 a, vec2 b) {
+    vec2 result;
+
+    result.x = Min(a.x, b.x);
+    result.y = Min(a.y, b.y);
+
+    return result;
+}
+
+inline vec3 Min(vec3 a, vec3 b) {
+    vec3 result;
+
+    result.x = Min(a.x, b.x);
+    result.y = Min(a.y, b.y);
+    result.z = Min(a.z, b.z);
+
+    return result;
+}
+
+inline float32 Min(vec3 a) {
+    return Min(Min(a.x, a.y), a.z);
+}
+
+inline vec4 Min(vec4 a, vec4 b) {
+    vec4 result;
+
+    result.x = Min(a.x, b.x);
+    result.y = Min(a.y, b.y);
+    result.z = Min(a.z, b.z);
+    result.w = Min(a.w, b.w);
+
+    return result;
+}
+
+inline vec2i Min(vec2i a, vec2i b) {
+    vec2i result;
+
+    result.x = Min(a.x, b.x);
+    result.y = Min(a.y, b.y);
+
+    return result;
+}
+
+inline vec3i Min(vec3i a, vec3i b) {
+    vec3i result;
+
+    result.x = Min(a.x, b.x);
+    result.y = Min(a.y, b.y);
+    result.z = Min(a.z, b.z);
+
+    return result;
+}
+
+inline vec4i Min(vec4i a, vec4i b) {
+    vec4i result;
+
+    result.x = Min(a.x, b.x);
+    result.y = Min(a.y, b.y);
+    result.z = Min(a.z, b.z);
+    result.w = Min(a.w, b.w);
+
+    return result;
+}
+
+inline vec2 Max(vec2 a, vec2 b) {
+    vec2 result;
+
+    result.x = Max(a.x, b.x);
+    result.y = Max(a.y, b.y);
+
+    return result;
+}
+
+inline vec3 Max(vec3 a, vec3 b) {
+    vec3 result;
+
+    result.x = Max(a.x, b.x);
+    result.y = Max(a.y, b.y);
+    result.z = Max(a.z, b.z);
+
+    return result;
+}
+
+
+inline float32 Max(vec3 a) {
+    return Max(Max(a.x, a.y), a.z);
+}
+
+inline vec4 Max(vec4 a, vec4 b) {
+    vec4 result;
+
+    result.x = Max(a.x, b.x);
+    result.y = Max(a.y, b.y);
+    result.z = Max(a.z, b.z);
+    result.w = Max(a.w, b.w);
+
+    return result;
+}
+
+inline vec2i Max(vec2i a, vec2i b) {
+    vec2i result;
+
+    result.x = Max(a.x, b.x);
+    result.y = Max(a.y, b.y);
+
+    return result;
+}
+
+inline vec3i Max(vec3i a, vec3i b) {
+    vec3i result;
+
+    result.x = Max(a.x, b.x);
+    result.y = Max(a.y, b.y);
+    result.z = Max(a.z, b.z);
+
+    return result;
+}
+
+inline vec4i Max(vec4i a, vec4i b) {
+    vec4i result;
+
+    result.x = Max(a.x, b.x);
+    result.y = Max(a.y, b.y);
+    result.z = Max(a.z, b.z);
+    result.w = Max(a.w, b.w);
+
+    return result;
+}
+
+inline float32 Length(vec2 a) {
+    float32 result = sqrtf(a.x * a.x + a.y * a.y);
+    return result;
+}
+
+inline float32 Length(vec2i a) {
+    float32 result = sqrtf(a.x * a.x + a.y * a.y);
+    return result;
+}
+
+inline float32 Length(vec3 a) {
+    float32 result = sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
+    return result;
+}
+
+inline float32 Length(vec4 a) {
+    float32 result = sqrtf(a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w);
+    return result;
+}
+
+inline float32 LengthSq(vec2 a) {
+    float32 result = a.x * a.x + a.y * a.y;
+    return result;
+}
+
+inline float32 LengthSq(vec3 a) {
+    float32 result = a.x * a.x + a.y * a.y + a.z * a.z;
+    return result;
+}
+
+inline float32 LengthSq(vec4 a) {
+    float32 result = a.x * a.x + a.y * a.y + a.z * a.z + a.w * a.w;
+    return result;
+}
+
+inline float32 Distance(vec2 a, vec2 b) {
+    return Length(b - a);
+}
+
+inline float32 Distance(vec2i a, vec2i b) {
+    return Length(b - a);
+}
+
+inline float32 Distance(vec3 a, vec3 b) {
+    return Length(b - a);
+}
+
+inline float32 Distance(vec4 a, vec4 b) {
+    return Length(b - a);
+}
+
+inline float32 DistanceSq(vec2 a, vec2 b) {
+    return LengthSq(b - a);
+}
+
+inline float32 DistanceSq(vec3 a, vec3 b) {
+    return LengthSq(b - a);
+}
+
+inline float32 DistanceSq(vec4 a, vec4 b) {
+    return LengthSq(b - a);
+}
+
+inline float32 Angle(vec2 a, vec2 b) {
+    float32 dot = Clamp(Dot(a, b), -1.0f, 1.0f);
+    float32 result = acosf(dot);
+    return result;
+}
+
+// @NOTE: we assume that a and b are normalized.
+// This is because dividing Dot(a, b) by Length(a) * Length(b) when they actually are normalized
+// can field a result > |1| which results in NaN.
+inline float32 Angle(vec3 a, vec3 b) {
+    float32 dot = Clamp(Dot(a, b), -1.0f, 1.0f);
+    float32 result = acosf(dot);
+    return result;
+}
+
+inline vec2 Normalize(vec2 a) {
+    vec2 result;
+
+    float length = Length(a);
+    result.x = SafeRatio(a.x, length, 0);
+    result.y = SafeRatio(a.y, length, 0);
+
+    return result;
+}
+
+inline vec3 Normalize(vec3 a) {
+    vec3 result;
+
+    float length = Length(a);
+    result.x = SafeRatio(a.x, length, 0);
+    result.y = SafeRatio(a.y, length, 0);
+    result.z = SafeRatio(a.z, length, 0);
+
+    return result;
+}
+
+inline vec4 Normalize(vec4 a) {
+    vec4 result;
+
+    float length = Length(a);
+    result.x = SafeRatio(a.x, length, 0);
+    result.y = SafeRatio(a.y, length, 0);
+    result.z = SafeRatio(a.z, length, 0);
+    result.w = SafeRatio(a.w, length, 0);
+
+    return result;
+}
+
+inline vec2 Lerp(vec2 a, vec2 b, float32 t) {
+    vec2 result;
+
+    result.x = Lerp(a.x, b.x, t);
+    result.y = Lerp(a.y, b.y, t);
+
+    return result;
+}
+
+inline vec3 Lerp(vec3 a, vec3 b, float32 t) {
+    vec3 result;
+
+    result.x = Lerp(a.x, b.x, t);
+    result.y = Lerp(a.y, b.y, t);
+    result.z = Lerp(a.z, b.z, t);
+
+    return result;
+}
+
+inline vec4 Lerp(vec4 a, vec4 b, float32 t) {
+    vec4 result;
+
+    result.x = Lerp(a.x, b.x, t);
+    result.y = Lerp(a.y, b.y, t);
+    result.z = Lerp(a.z, b.z, t);
+    result.w = Lerp(a.w, b.w, t);
+
+    return result;
+}
+
+inline vec2 NLerp(vec2 a, vec2 b, float32 t) {
+    vec2 result = Normalize(Lerp(a, b, t));
+
+    return result;
+}
+
+inline vec3 NLerp(vec3 a, vec3 b, float32 t) {
+    vec3 result = Normalize(Lerp(a, b, t));
+
+    return result;
+}
+
+inline vec4 NLerp(vec4 a, vec4 b, float32 t) {
+    vec4 result = Normalize(Lerp(a, b, t));
+
+    return result;
+}
+
+inline vec2 LeftHandPerp(vec2 a) {
+    vec2 result = V2(-a.y, a.x);
+
+    return result;
+}
+
+inline vec2 RightHandPerp(vec2 a) {
+    vec2 result = V2(a.y, -a.x);
+
+    return result;
+}
+
+inline vec3 Abs(vec3 v) {
+    vec3 result;
+    result.x = Abs(v.x);
+    result.y = Abs(v.y);
+    result.z = Abs(v.z);
+    return result;
+}
+
+inline int32 LargestComponent(vec3 v, uint32 *min0, uint32 *min1) {
+    v.x = Abs(v.x);
+    v.y = Abs(v.y);
+    v.z = Abs(v.z);
+
+    if (v.x > v.y && v.x > v.z) {
+        *min0 = 1;
+        *min1 = 2;
+        return 0;
+    }
+    if (v.y > v.x && v.y > v.z) {
+        *min0 = 0;
+        *min1 = 2;
+        return 1;
+    }
+    if (v.z > v.x && v.z > v.y) {
+        *min0 = 0;
+        *min1 = 1;
+        return 2;
+    }
+
+    return -1;
+}
+
+inline int32 LargestComponent(vec2 v, int32 *min0) {
+    v.x = Abs(v.x);
+    v.y = Abs(v.y);
+
+    if (v.x > v.y) {
+        *min0 = 1;
+        return 0;
+    }
+    if (v.y > v.x) {
+        *min0 = 0;
+        return 1;
+    }
+
+    return -1;
+}
+
+vec2 Cardinal4Clamp(vec2 dir) {
+    vec2 result = {};
+    
+    int32 smallestComp;
+    int32 largestComponent = LargestComponent(dir, &smallestComp);
+
+    if (largestComponent == -1) { return result; }
+
+    result.data[largestComponent] = dir.data[largestComponent];
+    if (result.data[largestComponent] < 0) {
+        result.data[largestComponent] = -1;
+    }
+    else if (result.data[largestComponent] > 0) {
+        result.data[largestComponent] = 1;
+    }
+
+    return result; 
+}
+
+bool HasNaN(vec3 v) {
+    return isnan(v.x) || isnan(v.y) || isnan(v.z);
+}
+
+
+bool NearlyEquals(vec2 a, vec2 b, float32 epsilon) {
+    return NearlyEquals(a.x, b.x, epsilon) &&
+        NearlyEquals(a.y, b.y, epsilon);
+}
+
+bool NearlyEquals(vec3 a, vec3 b, float32 epsilon) {
+    return NearlyEquals(a.x, b.x, epsilon) &&
+        NearlyEquals(a.y, b.y, epsilon) &&
+        NearlyEquals(a.z, b.z, epsilon);
+}
+
+bool NearlyEquals(vec4 a, vec4 b, float32 epsilon) {
+    return NearlyEquals(a.x, b.x, epsilon) &&
+        NearlyEquals(a.y, b.y, epsilon) &&
+        NearlyEquals(a.z, b.z, epsilon) &&
+        NearlyEquals(a.w, b.w, epsilon);
+}
+
+
+inline vec3 Project(vec3 a, vec3 p) {
+    float32 d = Dot(a, p);
+    float32 lenSq = LengthSq(a);
+    return (d / lenSq) * a;
+}
+
+inline vec3 ProjectPointOntoLine(vec3 pt, vec3 a, vec3 b) {
+    vec3 dir = Normalize(b - a);
+    return a + (dir * Dot(dir, pt - a));
+}
+
+vec3 Round(vec3 a) {
+    vec3 result = a;
+    result.x = Roundf(a.x);
+    result.y = Roundf(a.y);
+    result.z = Roundf(a.z);
+    return result;
+}
+
+vec3 Ceilv(vec3 a) {
+    vec3 result = a;
+    result.x = Ceilf(a.x);
+    result.y = Ceilf(a.y);
+    result.z = Ceilf(a.z);
+    return result;
+}
+
+vec2 Rotate(float32 angle, vec2 v) {
+    vec2 result;
+    result.x = cosf(angle) * v.x - sinf(angle) * v.y;
+    result.y = sinf(angle) * v.x + cosf(angle) * v.y;
+    return result;
+}

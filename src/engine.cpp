@@ -70,6 +70,7 @@ void Print(const char *fmt, ...) {
 #include "math/math.h"
 
 #include "common.h"
+#include "string.h"
 
 #include "raylib.h"
 
@@ -121,6 +122,14 @@ int main(void)
   InitWindow(Platform.screenWidth, Platform.screenHeight, "raylib [core] example - basic window");
 
   AllocateMemoryArena(&Engine.arena, Megabytes(1));
+
+  char *workingDirectory = (char *)GetWorkingDirectory();
+
+  if (StringEquals(workingDirectory, "build")) {
+    ChangeDirectory("..");
+  }
+
+  Print("WORKING DIRECTORY %s", workingDirectory);
   
   {
     InputManager *input = &Engine.input;
@@ -216,8 +225,6 @@ int main(void)
         
       camera.zoom = size / Mosaic->tileSize;
     }
-    
-
 
     // Update
     //----------------------------------------------------------------------------------

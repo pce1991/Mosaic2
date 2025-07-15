@@ -80,3 +80,6 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 @DESIGN: I like the idea of a tile radiating in scale when something steps on it. Provide along with the tile target values + speed. Dont think we do keyframe animations.
+
+
+@TODO: need to figure out working directory stuff. I hacked VS to change the working directory manually, but this will break if we try to run the exe from the working directory...

@@ -49,4 +49,3 @@ echo.
 echo Done. Output: %BUILD_DIR%\%NAME_PART%.exe
 echo Ready for debugging in Visual Studio!
 echo.
-pause

@@ -17,11 +17,44 @@ Texture2D testTexture = {};
 
 Texture2D bokeh = {};
 
+void SpawnBall(vec2 pos, float32 radius) {
+  // vec2 pos = V2(RandfRange(30, 60),
+  //               RandfRange(30, 40));
+
+  // float32 radius = RandfRange(6.0f, 12.0f);
+  float32 radiusSq = radius * radius;
+
+  for (int y = -radius; y <= radius; y++) {
+    for (int x = -radius; x <= radius; x++) {
+      Ball ball = {};
+        
+      ball.position.x = pos.x + x;
+      ball.position.y = pos.y + y;
+
+      float32 distSq = DistanceSq(pos, ball.position);
+
+      if (distSq > radiusSq) {
+        continue;
+      }
+      
+      vec3 hsv = {
+        .x = 32,
+        .y = RandfRange(0.5f, 0.7f),
+        .z = RandfRange(0.3f, 0.6f),
+      };
+
+      ball.color = HSVToRGB(hsv);
+
+      PushBack(&balls, ball);
+    }
+  }
+}
+
 void MosaicInit() {
   testTexture = LoadTexture("data/glube.png");
   bokeh = LoadTexture("data/textures/bokeh/waves_alpha.png");
   
-  SetMosaicGridSize(32, 32);
+  SetMosaicGridSize(80, 45);
   //SetMosaicGridSize(8, 8);
   //Mosaic->padding = 2;
 
@@ -31,26 +64,36 @@ void MosaicInit() {
 
   balls = MakeDynamicArray<Ball>(&Arena, 256);
 
-  for (int i = 0; i < 4096; i++) {
+  for (int y = 0; y < Mosaic->gridHeight; y++) {
+    for (int x = 0; x < Mosaic->gridWidth; x++) {
       Ball ball = {};
 
-      // ball.position.x = GetRandomValue(0, 9);
-      // ball.position.y = GetRandomValue(0, 9);
-
-      ball.position.x = RandfRange(0, 32);
-      ball.position.y = RandfRange(0, 32);
-
+      ball.position.x = x;
+      ball.position.y = y;
       
       vec3 hsv = {
         //.h = RandfRange(0.0f, 360.0f),
         .x = 206,
         .y = RandfRange(0.3f, 0.8f),
-        .z = RandfRange(0.4f, 0.7f),
+        .z = RandfRange(0.4f, 0.5f),
       };
 
       ball.color = HSVToRGB(hsv);
 
       PushBack(&balls, ball);
+    }
+  }
+
+  {
+    vec2 pos = V2(RandfRange(30, 60),
+                  RandfRange(30, 40));
+
+    float32 radius = RandfRange(6.0f, 8.0f);
+
+    SpawnBall(pos, radius);
+
+    SpawnBall(pos + V2(radius * 0.5f, -radius * 0.25f), radius);
+    SpawnBall(pos + V2(radius * 1.5f, radius * 0.7f), radius);
   }
 }
 
@@ -109,8 +152,8 @@ void MosaicUpdate() {
   for (int i = 0; i < balls.count; i++) {
     Ball ball = balls[i];
     //SetTileColor(ball.position.x, ball.position.y, 0.8f, 0.4f, 0.6f);
-    //SetTileColor(ball.position.x, ball.position.y, ball.color.r, ball.color.g, ball.color.b);
-    //SetTileSprite(ball.position.x, ball.position.y, &testTexture);
+    // SetTileColor(ball.position.x, ball.position.y, ball.color.r, ball.color.g, ball.color.b);
+    // SetTileSprite(ball.position.x, ball.position.y, &testTexture);
 
     SetTileTint(ball.position.x, ball.position.y, ball.color.r, ball.color.g, ball.color.b);
     SetTileSprite(ball.position.x, ball.position.y, &bokeh);
