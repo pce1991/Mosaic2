@@ -43,6 +43,36 @@ inline void SetTileColor(int32 x, int32 y, vec4 color) {
   }
 }
 
+inline void SetTileTint(int32 x, int32 y, vec4 tint) {
+  MTile*t = GetTile(x, y);
+  if (t) {
+    t->tint = tint;
+  }
+}
+
+
+inline void SetTileTint(int32 x, int32 y, float32 r, float32 g, float32 b) {
+  MTile*t = GetTile(x, y);
+  if (t) {
+    t->tint = V4(r, g, b, 1.0f);
+  }
+}
+
+inline void SetTileTint(vec2 position, float32 r, float32 g, float32 b) {
+  MTile*t = GetTile(position);
+  if (t) {
+    t->tint = V4(r, g, b, 1.0f);
+  }
+}
+
+inline void SetTileTint(vec2 position, vec4 tint) {
+  MTile*t = GetTile(position);
+  if (t) {
+    t->tint = tint;
+  }
+}
+
+
 inline void SetTileSprite(int32 x, int32 y, Texture2D *sprite) {
   MTile*t = GetTile(x, y);
   if (t) {
@@ -94,8 +124,6 @@ void SetMosaicGridSize(uint32 newWidth, uint32 newHeight) {
 }
 
 
-
-
 inline void SetTileColor(int32 x, int32 y, float32 r, float32 g, float32 b) {
   MTile*t = GetTile(x, y);
   if (t) {
@@ -116,9 +144,7 @@ inline void SetTileColor(vec2 position, vec4 color) {
     t->color = color;
   }
 }
-/*
 
- */
 
 vec2 GridPositionToWorldPosition(vec2i gridPosition) {
   vec2 worldPos = Mosaic->gridOrigin;

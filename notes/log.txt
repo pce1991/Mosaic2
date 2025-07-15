@@ -71,3 +71,10 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 @BUG: running project thru VS doesnt load the texture (I assume cause of a working directory thing?)
 
 @TODO: it seems like I might be able to do the alphablending that I want???
+
+
+- @TODO: want tiles to now have a scale + rotation.
+  I'm unsure if I want to only draw the sprite, or still draw the quad under it. We'd be able to use the color as tint if we do either/or.
+  I also wonder if it'd be cool to do a kinda fake
+  Maybe also provide an offset? Then we could do them like CRT pixels?
+      

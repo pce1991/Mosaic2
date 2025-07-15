@@ -6,6 +6,7 @@ struct MTile{
   vec4 color;
   
   Texture2D *sprite;
+  vec4 tint; // used with sprite
 };
 
 

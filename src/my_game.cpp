@@ -21,8 +21,8 @@ void MosaicInit() {
   testTexture = LoadTexture("data/glube.png");
   bokeh = LoadTexture("data/textures/bokeh/waves_alpha.png");
   
-  //SetMosaicGridSize(32, 32);
-  SetMosaicGridSize(8, 8);
+  SetMosaicGridSize(32, 32);
+  //SetMosaicGridSize(8, 8);
   //Mosaic->padding = 2;
 
   // @WARNING: we dont have that much memory for web builds so
@@ -31,14 +31,24 @@ void MosaicInit() {
 
   balls = MakeDynamicArray<Ball>(&Arena, 256);
 
-  for (int i = 0; i < 80; i++) {
+  for (int i = 0; i < 4096; i++) {
       Ball ball = {};
 
       // ball.position.x = GetRandomValue(0, 9);
       // ball.position.y = GetRandomValue(0, 9);
 
-      ball.position.x = RandfRange(0, 9);
-      ball.position.y = RandfRange(0, 9);
+      ball.position.x = RandfRange(0, 32);
+      ball.position.y = RandfRange(0, 32);
+
+      
+      vec3 hsv = {
+        //.h = RandfRange(0.0f, 360.0f),
+        .x = 206,
+        .y = RandfRange(0.3f, 0.8f),
+        .z = RandfRange(0.4f, 0.7f),
+      };
+
+      ball.color = HSVToRGB(hsv);
 
       PushBack(&balls, ball);
   }
@@ -60,14 +70,14 @@ void MosaicUpdate() {
       ball.position.x = RandfRange(0, 9);
       ball.position.y = RandfRange(0, 9);
 
-      // ball.velocity.x = RandfRange(1, 3);
-      // ball.velocity.y = RandfRange(1, 3);
+      ball.velocity.x = RandfRange(1, 8);
+      ball.velocity.y = RandfRange(1, 8);
 
 
       vec3 hsv = {
         //.h = RandfRange(0.0f, 360.0f),
         .x = 128,
-        .y = RandfRange(0.5f, 1.0f),
+        .y = RandfRange(0.0f, 0.1f),
         .z = RandfRange(0.5f, 1.0f),
       };
 
@@ -85,7 +95,7 @@ void MosaicUpdate() {
       float32 r = x / (Mosaic->gridWidth * 1.0f);
       float32 g = (1 + sinf(Time)) * 0.5f;
       float32 b = y / (Mosaic->gridHeight * 1.0f);
-      SetTileColor(x, y, r, g, b);
+      //SetTileColor(x, y, r, g, b);
     }
   }
 
@@ -97,8 +107,10 @@ void MosaicUpdate() {
   for (int i = 0; i < balls.count; i++) {
     Ball ball = balls[i];
     //SetTileColor(ball.position.x, ball.position.y, 0.8f, 0.4f, 0.6f);
-    SetTileColor(ball.position.x, ball.position.y, ball.color.r, ball.color.g, ball.color.b);
+    //SetTileColor(ball.position.x, ball.position.y, ball.color.r, ball.color.g, ball.color.b);
     //SetTileSprite(ball.position.x, ball.position.y, &testTexture);
+
+    SetTileTint(ball.position.x, ball.position.y, ball.color.r, ball.color.g, ball.color.b);
     SetTileSprite(ball.position.x, ball.position.y, &bokeh);
   }
         

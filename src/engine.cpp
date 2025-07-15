@@ -115,8 +115,8 @@ int main(void)
 
   // Initialization
   //--------------------------------------------------------------------------------------
-  Platform.screenWidth = 1600;
-  Platform.screenHeight = 900;
+  Platform.screenWidth = 1920;
+  Platform.screenHeight = 1080;
 
   InitWindow(Platform.screenWidth, Platform.screenHeight, "raylib [core] example - basic window");
 
@@ -258,7 +258,7 @@ int main(void)
           Texture2D *sprite = tile->sprite;
           pos = GridPositionToWorldPosition(tile->position);
 
-          float32 scale = 1.0f + ((1 + sinf(Time + (i * 0.5f))) / 2);
+          float32 scale = 1.0f + (((1 + sinf(Time + (i * 0.5f))) / 2) * 1.5f);
 
           Rectangle src = {};
           src.x = 0;
@@ -279,7 +279,16 @@ int main(void)
 
           //Print("origin %f %f", origin.x, origin.y);
                 
-          DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, BLUE);
+          //DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, BLUE);
+
+          Color c = {};
+          c.r = tile->tint.r * 255;
+          c.b = tile->tint.b * 255;
+          c.g = tile->tint.g * 255;
+          c.a = tile->tint.a * 255;
+
+          //DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, BLUE);
+          DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, c);
 
           //DrawCircle(pos.x, pos.y, 1, WHITE);
 
