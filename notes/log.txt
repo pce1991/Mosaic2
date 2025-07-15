@@ -77,4 +77,6 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
   I'm unsure if I want to only draw the sprite, or still draw the quad under it. We'd be able to use the color as tint if we do either/or.
   I also wonder if it'd be cool to do a kinda fake
   Maybe also provide an offset? Then we could do them like CRT pixels?
-      
+
+
+@DESIGN: I like the idea of a tile radiating in scale when something steps on it. Provide along with the tile target values + speed. Dont think we do keyframe animations.

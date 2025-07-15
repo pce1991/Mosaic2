@@ -76,8 +76,10 @@ void MosaicUpdate() {
 
       vec3 hsv = {
         //.h = RandfRange(0.0f, 360.0f),
-        .x = 128,
-        .y = RandfRange(0.0f, 0.1f),
+        //.x = RandfRange(128.0f, 206.0f),
+        //.x = RandfRange(0.0f, 60.0f),
+        .x = RandfRange(200, 280),
+        .y = RandfRange(0.4f, 1.0f),
         .z = RandfRange(0.5f, 1.0f),
       };
 
