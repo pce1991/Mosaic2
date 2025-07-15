@@ -3,7 +3,6 @@ setlocal enabledelayedexpansion
 
 if "%~1"=="" (
     echo Please drag a .cpp file from src/ onto this batch file or run it with a filename.
-    pause
     exit /b
 )
 

@@ -7,3 +7,6 @@
 #include "scalar.h"
 #include "vector.h"
 #include "color.h"
+#include "quaternion.h"
+#include "matrix.h"
+#include "geometry.h"

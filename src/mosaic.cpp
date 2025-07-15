@@ -124,6 +124,29 @@ void SetMosaicGridSize(uint32 newWidth, uint32 newHeight) {
 }
 
 
+inline void SetTileRotation(int32 x, int32 y, float32 ang) {
+  MTile*t = GetTile(x, y);
+  if (t) {
+    t->rotation = ang;
+  }
+}
+
+inline void SetTileRotation(vec2 position, float32 ang) {
+  return SetTileRotation(position.x, position.y, ang);
+}
+
+
+inline void SetTileScale(int32 x, int32 y, float32 scale) {
+  MTile*t = GetTile(x, y);
+  if (t) {
+    t->scale = scale;
+  }
+}
+
+inline void SetTileScale(vec2 position, float32 scale) {
+  return SetTileScale(position.x, position.y, scale);
+}
+
 inline void SetTileColor(int32 x, int32 y, float32 r, float32 g, float32 b) {
   MTile*t = GetTile(x, y);
   if (t) {
@@ -247,6 +270,8 @@ void MosaicInternalUpdate() {
     MTile *tile = &Mosaic->tiles[i];
 
     tile->color = V4(0, 0, 0, 1);
+    tile->rotation = 0;
+    tile->scale = 1;
     tile->sprite = NULL;
   }
 }

@@ -7,6 +7,8 @@ struct MTile{
   
   Texture2D *sprite;
   vec4 tint; // used with sprite
+  float32 rotation;
+  float32 scale;
 };
 
 

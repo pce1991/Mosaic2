@@ -84,7 +84,7 @@ void RaylibPushKeyboardEvents(InputManager *input, InputDevice *device) {
       continue;
     }
 
-    //Print("raylib key %d mapped to %d / %d", key, event.index, device->discreteCount);
+    Print("raylib key %d mapped to %d / %d", key, event.index, device->discreteCount);
 
     PushInputEvent(input, event);
   }

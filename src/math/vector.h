@@ -1417,3 +1417,74 @@ vec2 Rotate(float32 angle, vec2 v) {
     result.y = sinf(angle) * v.x + cosf(angle) * v.y;
     return result;
 }
+
+
+
+inline vec2 Dampen(vec2 a, float32 t) {
+    vec2 v = a - a * t;
+
+    if (Dot(v, a) < 0) {
+        return V2(0);
+    }
+
+    return v;
+}
+
+inline vec3 Dampen(vec3 a, float32 t) {
+    vec3 v = a - a * t;
+
+    if (Dot(v, a) < 0) {
+        return V3(0);
+    }
+
+    return v;
+}
+
+
+inline vec2 ClampLength(vec2 const &v, float32 maxLength) {
+    float32 len = Length(v);
+    if (len > maxLength) {
+        return (v / len) * maxLength;
+    }
+
+    return v;
+}
+
+inline void ClampLength(vec2 *v, float32 maxLength) {
+    float32 len = Length(*v);
+    if (len > maxLength) {
+        *v = (*v / len) * maxLength;
+    }
+}
+
+inline vec3 ClampLength(vec3 const &v, float32 maxLength) {
+    float32 len = Length(v);
+    if (len > maxLength) {
+        return (v / len) * maxLength;
+    }
+
+    return v;
+}
+
+inline void ClampLength(vec3 *v, float32 maxLength) {
+    float32 len = Length(*v);
+    if (len > maxLength) {
+        *v = (*v / len) * maxLength;
+    }
+}
+
+inline vec4 ClampLength(vec4 const &v, float32 maxLength) {
+    float32 len = Length(v);
+    if (len > maxLength) {
+        return (v / len) * maxLength;
+    }
+
+    return v;
+}
+
+inline void ClampLength(vec4 *v, float32 maxLength) {
+    float32 len = Length(*v);
+    if (len > maxLength) {
+        *v = (*v / len) * maxLength;
+    }
+}

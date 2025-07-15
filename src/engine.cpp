@@ -67,9 +67,10 @@ void Print(const char *fmt, ...) {
 #include "memory.h"
 #include "dynamic_array.h"
 
+#include "common.h"
+
 #include "math/math.h"
 
-#include "common.h"
 #include "string.h"
 
 #include "raylib.h"
@@ -91,6 +92,7 @@ void MosaicInit();
 void MosaicUpdate();
 
 
+
 struct EngineMem {
   InputDevice *keyboard;
   InputDevice *mouse;
@@ -101,6 +103,8 @@ struct EngineMem {
   MemoryArena arena;
 
   InputManager input;
+
+  Image perlinNoise;
 };
 
 InputDevice *Keyboard = NULL;
@@ -151,6 +155,8 @@ int main(void)
     SetMousePosition(Platform.screenWidth / 2,
                      Platform.screenHeight / 2);
   }
+
+  Engine.perlinNoise= GenImagePerlinNoise(Platform.screenWidth, Platform.screenHeight, 50, 50, 4.0f);
 
   SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
@@ -265,7 +271,7 @@ int main(void)
           Texture2D *sprite = tile->sprite;
           pos = GridPositionToWorldPosition(tile->position);
 
-          float32 scale = 1.0f + (((1 + sinf(Time + (i * 0.5f))) / 2) * 1.5f);
+          float32 scale = tile->scale; 
 
           Rectangle src = {};
           src.x = 0;
@@ -295,7 +301,7 @@ int main(void)
           c.a = tile->tint.a * 255;
 
           //DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, BLUE);
-          DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, 10 * Time + i, c);
+          DrawTexturePro(*sprite, src, dest, Vector2{origin.x, origin.y}, tile->rotation, c);
 
           //DrawCircle(pos.x, pos.y, 1, WHITE);
 

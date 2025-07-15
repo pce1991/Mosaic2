@@ -83,3 +83,10 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 @TODO: need to figure out working directory stuff. I hacked VS to change the working directory manually, but this will break if we try to run the exe from the working directory...
+
+
+
+@TODO: I kinda want to just compile it as game.exe all the time... supply an optional exe name. But that way we can easily compile different name files while still getting the same exe used for VS
+
+
+@BUG: arrows are messed up. In fact a lot of the mappings are just super off. 

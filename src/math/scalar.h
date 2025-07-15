@@ -416,3 +416,32 @@ inline bool InRange(float32 n, float32 min, float32 max) {
     return n >= min && n <= max;
 }
 
+
+inline float32 Dampen(float32 n, float32 t) {
+    float32 m = n - n * t;
+
+    if (Signum(m) != Signum(n)) {
+        return 0;
+    }
+
+    return m;
+}
+
+inline float32 MoveTowards(float32 n, float32 target, float32 delta) {
+    if (n == target) { return n; }
+    
+    n = n + delta;
+
+    if (delta < 0) {
+        if (n < target) {
+            n = target;
+        }
+    }
+    else {
+        if (n > target) {
+            n = target;
+        }
+    }
+    
+    return n;
+}
