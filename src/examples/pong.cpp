@@ -29,6 +29,8 @@ struct GameMem {
   int32 score;
   
   float32 spawnTimer;
+
+  int32 lastScoreSpawned;
   
   Paddle paddles[2];
 
@@ -56,7 +58,7 @@ void SpawnBall(vec2 position, vec2 velocity) {
   ball.position = position;
   ball.velocity = velocity;
 
-  ball.radius = 3;
+  ball.radius = 2.5;
 
   ball.health = 3;
 
@@ -157,18 +159,31 @@ void MosaicUpdate() {
 
   Game.spawnTimer += DeltaTime;
 
-  float32 ballSpawnRate = 8.0f;
-
-  if (Game.spawnTimer >= ballSpawnRate && Game.balls.count < 10) {
-    SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
+//   float32 ballSpawnRate = 8.0f;
+// if (Game.spawnTimer >= ballSpawnRate && Game.balls.count < 10) {
+//     SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
     
-    Game.spawnTimer -= ballSpawnRate;
+//     Game.spawnTimer -= ballSpawnRate;
+//   }
+
+  if (Game.balls.count == 0) {
+    SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
   }
 
+  {
+    int32 scoreDelta = Game.score - Game.lastScoreSpawned;
+
+    if (scoreDelta >= 5) {
+      SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
+      Game.lastScoreSpawned = Game.score;
+    }
+  }
+
+  
   if (InputHeld(Keyboard, Input_Space)) {
     SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
       
-    DynamicArrayClear(&Game.balls);
+    //DynamicArrayClear(&Game.balls);
   }
 
   // update paddle movement
@@ -306,7 +321,7 @@ void MosaicUpdate() {
         ball->position.y = 0;
         ball->velocity.y *= -1;
 
-        Game.score--;
+        Game.score -= 10;
         Game.score = Max(Game.score, 0);
 
         ball->health = 0;
@@ -372,6 +387,9 @@ void MosaicUpdate() {
 
       float32 radius = ball->radius;
       float32 radiusSq = ball->radius * ball->radius;
+
+      int32 index = 0;
+      
       for (int y = -radius; y <= radius; y++) {
         for (int x = -radius; x <= radius; x++) {
 
@@ -383,9 +401,14 @@ void MosaicUpdate() {
           continue;
         }
 
+        float32 scale = (2.0 + (((1 + sinf(4 * Time + (index * 0.5f))) / 2) * 1.0f));
+
         SetTileTint(position.x, position.y, ball->color.r, ball->color.g, ball->color.b);
         SetTileSprite(position.x, position.y, &bokeh);
-        SetTileScale(position.x, position.y, 2.0f);
+        SetTileScale(position.x, position.y, scale);
+        SetTileRotation(position.x, position.y, (Time + i) * 30);
+
+        index++;
         }
       }
     }

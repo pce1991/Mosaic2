@@ -92,3 +92,6 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 @BUG: arrows are messed up. In fact a lot of the mappings are just super off.
 - wonder if it'd be easier to just make this is code?
 - the first 39 entries are empty
+
+
+@TODO: try casting a shadow or doing some type of effect on the tiles below the ball
