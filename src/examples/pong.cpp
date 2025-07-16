@@ -321,7 +321,7 @@ void MosaicUpdate() {
         ball->position.y = 0;
         ball->velocity.y *= -1;
 
-        Game.score -= 10;
+        Game.score -= 5;
         Game.score = Max(Game.score, 0);
 
         ball->health = 0;
