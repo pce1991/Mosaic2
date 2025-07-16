@@ -56,7 +56,7 @@ void SpawnBall(vec2 position, vec2 velocity) {
   ball.position = position;
   ball.velocity = velocity;
 
-  ball.radius = 1;
+  ball.radius = 3;
 
   ball.health = 3;
 
@@ -159,10 +159,16 @@ void MosaicUpdate() {
 
   float32 ballSpawnRate = 8.0f;
 
-  if (Game.spawnTimer >= ballSpawnRate) {
-    SpawnBall(V2(40, 80), V2(RandfRange(-10, 10), -40));
+  if (Game.spawnTimer >= ballSpawnRate && Game.balls.count < 10) {
+    SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
     
     Game.spawnTimer -= ballSpawnRate;
+  }
+
+  if (InputHeld(Keyboard, Input_Space)) {
+    SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
+      
+    DynamicArrayClear(&Game.balls);
   }
 
   // update paddle movement
@@ -170,6 +176,8 @@ void MosaicUpdate() {
     Paddle *paddle = &Game.paddles[0];
     
     int32 moveDirection = 0;
+
+    
     if (InputHeld(Keyboard, Input_A)) {
       moveDirection = -1;
     }
@@ -177,8 +185,17 @@ void MosaicUpdate() {
       moveDirection = 1;
     }
 
-    float32 maxSpeed = 40;
-    float32 accel = 300;
+    // HACK
+    if (IsKeyDown(KEY_LEFT)) {
+      moveDirection = -1;
+    }
+    else if (IsKeyDown(KEY_RIGHT)) {
+      moveDirection = 1;
+    }
+
+
+    float32 maxSpeed = 60;
+    float32 accel = 500;
     
     if (moveDirection != 0) {
       paddle->velocity.x += accel * moveDirection * DeltaTime;
@@ -239,7 +256,7 @@ void MosaicUpdate() {
         
       // }
 
-      vec2 dir;
+      vec2 dir = V2(0);
       if (TestAABBAABB(ballMin, ballMax, paddleMin, paddleMax, &dir)) {
         ball->position = ball->position + dir;
 
@@ -373,7 +390,7 @@ void MosaicUpdate() {
     }
   }
 
-  DrawTextf(V2(Mosaic->tileSize * Mosaic->gridWidth * 0.5f, 0), 80, V4(1, 1, 1, 1),
+  DrawTextf(V2((Mosaic->tileSize * Mosaic->gridWidth * 0.5f) + 20, 0), 80, V4(1, 1, 1, 1),
             "SCORE %d", Game.score);
   //DrawText("MOSAIC", 0, 0, 40, WHITE);
   //DrawText("MOSAIC", Mosaic->tileSize * Mosaic->gridWidth, 0, 40, WHITE);
