@@ -65,11 +65,11 @@ void Print(const char *fmt, ...) {
 
 
 #include "memory.h"
-#include "dynamic_array.h"
-
 #include "common.h"
 
 #include "math/math.h"
+
+#include "dynamic_array.h"
 
 #include "string.h"
 
@@ -120,8 +120,8 @@ int main(void)
 
   // Initialization
   //--------------------------------------------------------------------------------------
-  Platform.screenWidth = 1920;
-  Platform.screenHeight = 1080;
+  Platform.screenWidth = 3200;
+  Platform.screenHeight = 1800;
 
   InitWindow(Platform.screenWidth, Platform.screenHeight, "raylib [core] example - basic window");
 
@@ -193,6 +193,10 @@ int main(void)
     Time = GetTime();
     DeltaTime = GetFrameTime();
 
+    if (DeltaTime >= 1 / 60.0f) {
+      DeltaTime = 1.0f / 60.0f;
+    }
+
     {
       InputManager *input = &Engine.input;
       DynamicArrayClear(&input->events);
@@ -245,6 +249,9 @@ int main(void)
 
     //DrawText("MOSAIC", 190, 200, 40, WHITE);
         
+    BeginMode2D(camera);
+
+    BeginBlendMode(1);
 
     MosaicInternalUpdate();
     MosaicUpdate();
@@ -252,10 +259,6 @@ int main(void)
 
     // @TODO: Mosaic should be accumulating a list of draw text commands 
     // which we iterate and call the correct stuff for
-        
-    BeginMode2D(camera);
-
-    BeginBlendMode(1);
 
     {
       MTile *tiles = Mosaic->tiles;
@@ -314,51 +317,7 @@ int main(void)
 
     EndBlendMode();
 
-    //DrawTile(V2i(0, 0), V3(1, 1, 1));
-    //DrawTile(V2i(Mosaic->gridWidth - 1, 0), V3(0, 0, 1));
-    //DrawTile(V2i(Mosaic->gridWidth - 1, Mosaic->gridHeight - 1), V3(1, 0, 0));
-
-        
-    //printf("orig %d %d\n", Mosaic->gridOrigin.x, Mosaic->gridOrigin.y);
-
-    //SetTileColor();
-        
-    // hmm frustrating that a text size of 1 isn't the same as a tile...
-    // looks like the default size is 10, and since we just take an integer gonna need to 
-    // generate a new font...
-    //DrawText("MOSAIC", 0, 0, 40, WHITE);
-       
-    //DrawRectangle(0, 0, 50, 50, GRAY);
-        
-    //DrawRectangle(-300, -250, 50, 50, GRAY);
-
-    // DrawCircle(Mosaic->gridOrigin.x, Mosaic->gridOrigin.y, 1, WHITE);
-    // DrawCircle(0, 0, 1, BLACK);
-
-#if 0
-    {
-      vec2 pos = GridPositionToWorldPosition(V2i(0, 0));
-      //DrawTextureEx(testTexture, {pos.x, pos.y}, 0, 0.5f, WHITE);
-                
-      pos = GridPositionToWorldPosition(V2i(4, 4));
-
-      Rectangle src = {};
-      src.x = 0;
-      src.y = 0;
-      src.width = testTexture.width;
-      src.height = testTexture.height;
-                
-      Rectangle dest = {};
-      dest.x = pos.x;
-      dest.y = pos.y;
-      dest.width = Mosaic->tileSize;
-      dest.height = Mosaic->tileSize;
-                
-      DrawTexturePro(testTexture, src, dest, Vector2{0, 0}, 0.0, WHITE);
-    }
-#endif
-        
-
+    //DrawText("MOSAIC", Mosaic->tileSize * Mosaic->gridWidth, 0, 40, WHITE);
         
     EndMode2D();
         

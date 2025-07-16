@@ -89,4 +89,6 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 @TODO: I kinda want to just compile it as game.exe all the time... supply an optional exe name. But that way we can easily compile different name files while still getting the same exe used for VS
 
 
-@BUG: arrows are messed up. In fact a lot of the mappings are just super off. 
+@BUG: arrows are messed up. In fact a lot of the mappings are just super off.
+- wonder if it'd be easier to just make this is code?
+- the first 39 entries are empty

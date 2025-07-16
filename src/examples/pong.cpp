@@ -7,7 +7,11 @@ struct Ball {
   vec2 position;
   vec2 velocity;
 
+  float32 radius;
+
   vec3 color;
+
+  int32 health;
 };
 
 struct Paddle {
@@ -22,52 +26,48 @@ struct Paddle {
 };
 
 struct GameMem {
+  int32 score;
+  
+  float32 spawnTimer;
+  
   Paddle paddles[2];
+
+  DynamicArray<Ball> balls;
 };
 
 GameMem Game = {};
-
-DynamicArray<Ball> balls = {};
-
 
 Texture2D testTexture = {};
 
 Texture2D bokeh = {};
 
-void SpawnBall(vec2 pos, float32 radius) {
-  float32 radiusSq = radius * radius;
+struct TileData {
+  vec3 color;
+  float32 rotation;
+  float32 scale;
+};
 
-  for (int y = -radius; y <= radius; y++) {
-    for (int x = -radius; x <= radius; x++) {
-      Ball ball = {};
-        
-      ball.position.x = pos.x + x;
-      ball.position.y = pos.y + y;
+DynamicArray<TileData> backgroundTileData = {};
 
-      float32 distSq = DistanceSq(pos, ball.position);
+void SpawnBall(vec2 position, vec2 velocity) {
+  Ball ball = {};
+  ball.color = V3(0.2f, 0.8f, 0.5f);
 
-      if (distSq > radiusSq) {
-        continue;
-      }
-      
-      vec3 hsv = {
-        .x = 32,
-        .y = RandfRange(0.5f, 0.7f),
-        .z = RandfRange(0.3f, 0.6f),
-      };
+  ball.position = position;
+  ball.velocity = velocity;
 
-      ball.color = HSVToRGB(hsv);
+  ball.radius = 1;
 
-      PushBack(&balls, ball);
-    }
-  }
+  ball.health = 3;
+
+  PushBack(&Game.balls, ball);
 }
 
 void MosaicInit() {
   testTexture = LoadTexture("data/glube.png");
   bokeh = LoadTexture("data/textures/bokeh/waves_alpha2.png");
   
-  SetMosaicGridSize(60, 80);
+  SetMosaicGridSize(80, 120);
   //SetMosaicGridSize(8, 8);
   //Mosaic->padding = 2;
 
@@ -75,12 +75,33 @@ void MosaicInit() {
   // allolcating 64MB is no bueno.
   AllocateMemoryArena(&Arena, Megabytes(8));
 
-  balls = MakeDynamicArray<Ball>(&Arena, 256);
+  backgroundTileData = MakeDynamicArray<TileData>(&Arena, Mosaic->tileCapacity);
+
+  for (int y = 0; y < Mosaic->gridHeight; y++) {
+    for (int x = 0; x < Mosaic->gridWidth; x++) {
+      TileData data = {};
+      data.scale = RandfRange(0.0f, 0.25f);
+      data.rotation = RandfRange(0, 360);
+
+      vec3 hsv = {
+        .x = 32,
+        .y = RandfRange(0.5f, 0.7f),
+        .z = RandfRange(0.1f, 0.4f),
+      };
+      data.color = HSVToRGB(hsv);
+
+      PushBack(&backgroundTileData, data);
+    }
+  }
+
+  Game.balls = MakeDynamicArray<Ball>(&Arena, 16);
+
+  SpawnBall(V2(40, 80), V2(0, -30));
 
   {
     Game.paddles[0] = {
-      .width = 7,
-      .height = 2,
+      .width = 11,
+      .height = 3,
       .position = V2(22, 12),
       .color = V3(1, 1, 1)
     };
@@ -103,7 +124,46 @@ void DrawPaddle(Paddle paddle) {
   }
 }
 
+Color Vec4ToColor(vec4 v) {
+  Color c = {};
+  c.r = v.r * 255;
+  c.b = v.b * 255;
+  c.g = v.g * 255;
+  c.a = v.a * 255;
+
+  return c;
+}
+
+void DrawTextf(vec2 pos, float32 size, vec4 color, const char *fmt, ...) {
+  va_list args;
+  va_start (args, fmt);
+
+  char str[1024];
+  vsnprintf(str, 1024, fmt, args);
+
+  vec2 floorPos = V2(floorf(pos.x), -floorf(pos.y));
+    
+  vec2 position = Mosaic->gridOrigin + floorPos + V2(0.0f, -1.0f);
+
+  Color c = Vec4ToColor(color);
+          
+  DrawText(str, pos.x, pos.y, size, c);
+
+  va_end(args);
+}
+
+
 void MosaicUpdate() {
+
+  Game.spawnTimer += DeltaTime;
+
+  float32 ballSpawnRate = 8.0f;
+
+  if (Game.spawnTimer >= ballSpawnRate) {
+    SpawnBall(V2(40, 80), V2(RandfRange(-10, 10), -40));
+    
+    Game.spawnTimer -= ballSpawnRate;
+  }
 
   // update paddle movement
   {
@@ -136,18 +196,147 @@ void MosaicUpdate() {
   }
 
   {
+    float32 maxSpeed = 65;
+      
+    for (int i = 0; i < Game.balls.count; i++) {
+      Ball *ball = &Game.balls[i];
+
+      ball->velocity = ClampLength(ball->velocity, maxSpeed);
+
+      if (Absf(ball->velocity.y) < 1.0f) {
+        ball->velocity.y = 10;
+      }
+
+      ball->position = ball->position + ball->velocity * DeltaTime;
+    }
+  }
+
+  // collision against paddles
+  {
+    Paddle *paddle = &Game.paddles[0];
+    vec2 paddleMin = paddle->position;
+    vec2 paddleMax = paddle->position + V2(paddle->width, paddle->height);
+    
+    for (int i = 0; i < Game.balls.count; i++) {
+      Ball *ball = &Game.balls[i];
+
+      // vec2 ballMin = ball->position;
+      // vec2 ballMax = ball->position + V2(1, 1);
+
+      vec2 ballMin = ball->position - V2(ball->radius);
+      vec2 ballMax = ball->position + V2(ball->radius);
+
+      vec2 ballCenter = Lerp(ballMin, ballMax, 0.5f);
+
+
+      // @TODO: we need to check the position of the ball at the start of this frame!
+      // Ray2D velRay;
+      // velRay.origin = ballCenter;
+      // velRay.direction = ball->velocity;
+
+      // float32 tHit;
+      // if (RaycastAABB(paddleMin, paddleMax, velRay, &tHit)) {
+        
+      // }
+
+      vec2 dir;
+      if (TestAABBAABB(ballMin, ballMax, paddleMin, paddleMax, &dir)) {
+        ball->position = ball->position + dir;
+
+        ball->velocity.y *= -1;
+
+        float32 swipeScale = 1.1f;
+        ball->velocity.x += paddle->velocity.x * swipeScale;
+
+        ball->health--;
+
+        Game.score++;
+
+        // if (ball->health == 2) {
+        //   vec3 hsv = {
+        //     .x = 32,
+        //     .y = RandfRange(0.5f, 0.7f),
+        //     .z = RandfRange(0.3f, 0.6f),
+        //   };
+          
+        //   ball->color = HSVToRGB(hsv);
+        // }
+        // else if (ball->health == 1) {
+        //   ball->color = V3(0.7f, 0.3f, 0.3f);
+        // }
+      }
+    }
+  }
+
+  // collision against walls
+  {
+    for (int i = 0; i < Game.balls.count; i++) {
+      Ball *ball = &Game.balls[i];
+
+      vec2 ballMin = ball->position;
+      vec2 ballMax = ball->position + V2(1, 1);
+
+      if (ballMin.x < 0) {
+        ball->position.x = 0;
+        ball->velocity.x *= -1;
+      }
+      if (ballMax.x >= Mosaic->gridWidth) {
+        ball->position.x = Mosaic->gridWidth - 1;;
+        ball->velocity.x *= -1;
+      }
+      
+      if (ballMin.y < 0) {
+        ball->position.y = 0;
+        ball->velocity.y *= -1;
+
+        Game.score--;
+
+        Game.score = Max(Game.score, 0);
+      }
+      if (ballMax.y >= Mosaic->gridHeight) {
+        ball->position.y = Mosaic->gridHeight - 1;;
+        ball->velocity.y *= -1;
+      }
+    }
+  }
+
+  
+
+  // @TODO: make an easy function for this for clamping an AABB to a bounds
+  {
+    Paddle *paddle = &Game.paddles[0];
+    vec2 paddleMin = paddle->position;
+    vec2 paddleMax = paddle->position + V2(paddle->width, paddle->height);
+
+    if (paddleMin.x < 0) {
+      paddle->position.x = 0;
+    }
+    if (paddleMax.x >= Mosaic->gridWidth) {
+      paddle->position.x = Mosaic->gridWidth - paddle->width;
+    }
+  }
+
+  {
+    for (int i = Game.balls.count - 1; i >= 0; i--) {
+      Ball *ball = &Game.balls[i];
+      // if (ball->health <= 0) {
+      //   RemoveAtIndex(&Game.balls, i);
+      // }
+    }
+  }
+
+  // RENDER
+  {
     int32 index = 0;
     for (int y = 0; y < Mosaic->gridHeight; y++) {
       for (int x = 0; x < Mosaic->gridWidth; x++) {
-        // float32 r = x / (Mosaic->gridWidth * 1.0f);
-        // float32 g = (1 + sinf(Time)) * 0.5f;
-        // float32 b = y / (Mosaic->gridHeight * 1.0f);
+        TileData data = backgroundTileData[index];
 
-        float32 scale = 1.0f + (((1 + sinf(Time + (index * 0.5f))) / 2) * 1.25f);
+        float32 scale = (1.0f + (((1 + sinf(Time + (index * 0.5f))) / 2) * 1.25f)) + data.scale;
+        float32 rotation = 10 * (Time + index) + data.rotation;
 
-        float32 rotation = 10 * (Time + x * y);
-
-        SetTileTint(x, y, 0.2f, 0.2f, 0.2f);
+        //SetTileTint(x, y, 0.2f, 0.2f, 0.2f);
+        SetTileTint(x, y, data.color.r, data.color.g, data.color.b);
         SetTileSprite(x, y, &bokeh);
 
         SetTileScale(x, y, scale);
@@ -158,4 +347,35 @@ void MosaicUpdate() {
   }
 
   DrawPaddle(Game.paddles[0]);
+
+  {
+    for (int i = 0; i < Game.balls.count; i++) {
+      Ball *ball = &Game.balls[i];
+
+      float32 radius = ball->radius;
+      float32 radiusSq = ball->radius * ball->radius;
+      for (int y = -radius; y <= radius; y++) {
+        for (int x = -radius; x <= radius; x++) {
+
+        vec2 position = ball->position + V2(x, y);
+
+        float32 distSq = DistanceSq(position, ball->position);
+
+        if (distSq > radiusSq) {
+          continue;
+        }
+
+        SetTileTint(position.x, position.y, ball->color.r, ball->color.g, ball->color.b);
+        SetTileSprite(position.x, position.y, &bokeh);
+        SetTileScale(position.x, position.y, 2.0f);
+        }
+      }
+    }
+  }
+
+  DrawTextf(V2(Mosaic->tileSize * Mosaic->gridWidth * 0.5f, 0), 80, V4(1, 1, 1, 1),
+            "SCORE %d", Game.score);
+  //DrawText("MOSAIC", 0, 0, 40, WHITE);
+  //DrawText("MOSAIC", Mosaic->tileSize * Mosaic->gridWidth, 0, 40, WHITE);
+  //DrawText("MOSAIC", Mosaic->tileSize * Mosaic->gridWidth, 0, 40, WHITE);
 }
