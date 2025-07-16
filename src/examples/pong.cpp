@@ -265,7 +265,7 @@ void MosaicUpdate() {
         float32 swipeScale = 1.1f;
         ball->velocity.x += paddle->velocity.x * swipeScale;
 
-        ball->health--;
+        //ball->health--;
 
         Game.score++;
 
@@ -307,8 +307,9 @@ void MosaicUpdate() {
         ball->velocity.y *= -1;
 
         Game.score--;
-
         Game.score = Max(Game.score, 0);
+
+        ball->health = 0;
       }
       if (ballMax.y >= Mosaic->gridHeight) {
         ball->position.y = Mosaic->gridHeight - 1;;
@@ -336,9 +337,9 @@ void MosaicUpdate() {
   {
     for (int i = Game.balls.count - 1; i >= 0; i--) {
       Ball *ball = &Game.balls[i];
-      // if (ball->health <= 0) {
-      //   RemoveAtIndex(&Game.balls, i);
-      // }
+      if (ball->health <= 0) {
+        RemoveAtIndex(&Game.balls, i);
+      }
     }
   }
 
