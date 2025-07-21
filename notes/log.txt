@@ -95,3 +95,10 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 @TODO: try casting a shadow or doing some type of effect on the tiles below the ball
+
+
+@TODO: think the triggers are on the range -1 to 1? need to figure that out
+
+
+
+@TODO: maybe we want to throw an error if we're looking for the input ID on the wrong device (like FaceA on Keyboard)

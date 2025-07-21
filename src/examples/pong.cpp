@@ -190,7 +190,7 @@ void MosaicUpdate() {
   {
     Paddle *paddle = &Game.paddles[0];
     
-    int32 moveDirection = 0;
+    float32 moveDirection = 0;
 
     
     if (InputHeld(Keyboard, Input_A)) {
@@ -199,6 +199,18 @@ void MosaicUpdate() {
     else if (InputHeld(Keyboard, Input_D)) {
       moveDirection = 1;
     }
+
+    
+    {
+      float32 stick = InputAnalogue(Gamepad, Input_LeftStickX);
+
+      Print("stick value %f", stick);
+
+      if (stick != 0) {
+        moveDirection = stick;
+      }
+    }
+
 
     // HACK
     if (IsKeyDown(KEY_LEFT)) {

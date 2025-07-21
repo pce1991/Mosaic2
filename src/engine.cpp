@@ -96,6 +96,7 @@ void MosaicUpdate();
 struct EngineMem {
   InputDevice *keyboard;
   InputDevice *mouse;
+  InputDevice *gamepads[4];
 
   vec2 mousePosition;
   vec2 mousePositionNorm;
@@ -109,6 +110,8 @@ struct EngineMem {
 
 InputDevice *Keyboard = NULL;
 InputDevice *Mouse = NULL;
+InputDevice *Gamepads[4];
+InputDevice *Gamepad = NULL;
 
 EngineMem Engine = {};
 
@@ -141,16 +144,39 @@ int main(void)
     // 4 controllers + mouse & keyboard
     AllocateInputManager(input, &Engine.arena, 32, 6);
 
-    AllocateInputDevice(&input->devices[0], InputDeviceType_Keyboard, Input_KeyCount, 0);
+    AllocateInputDevice(&input->devices[0], InputDeviceType_Keyboard, Input_KeyCount, 0, -1);
     AllocateInputDevice(&input->devices[1], InputDeviceType_Mouse,
-                        Input_MouseDiscreteCount, Input_MouseAnalogueCount);
+                        Input_MouseDiscreteCount, Input_MouseAnalogueCount, -1);
+
+    AllocateInputDevice(&input->devices[2], InputDeviceType_Gamepad,
+                        Input_GamepadButtonCount, Input_GamepadAnalogueCount, 0);
+
+    AllocateInputDevice(&input->devices[3], InputDeviceType_Gamepad,
+                        Input_GamepadButtonCount, Input_GamepadAnalogueCount, 1);
+
+    AllocateInputDevice(&input->devices[4], InputDeviceType_Gamepad,
+                        Input_GamepadButtonCount, Input_GamepadAnalogueCount, 2);
+
+    AllocateInputDevice(&input->devices[5], InputDeviceType_Gamepad,
+                        Input_GamepadButtonCount, Input_GamepadAnalogueCount, 3);
 
     Engine.keyboard = &input->devices[0];
     Engine.mouse = &input->devices[1];
 
+    Engine.gamepads[0] = &input->devices[2];
+    Engine.gamepads[1] = &input->devices[3];
+    Engine.gamepads[2] = &input->devices[4];
+    Engine.gamepads[3] = &input->devices[5];
+
     Keyboard = Engine.keyboard;
     Mouse = Engine.mouse;
 
+    Gamepads[0] = Engine.gamepads[0];
+    Gamepads[1] = Engine.gamepads[1];
+    Gamepads[2] = Engine.gamepads[2];
+    Gamepads[3] = Engine.gamepads[3];
+
+    Gamepad = Gamepads[0];
     
     SetMousePosition(Platform.screenWidth / 2,
                      Platform.screenHeight / 2);
@@ -203,6 +229,11 @@ int main(void)
     
       RaylibPushKeyboardEvents(input, Engine.keyboard);
       RaylibPushMouseEvents(input, Engine.mouse);
+
+      for (int i = 0; i < 4; i++) {
+        RaylibPushGamepadEvents(input, Engine.gamepads[i]);
+      }
+      
 
       Engine.mousePosition.x = GetMouseX();
       Engine.mousePosition.y = GetMouseX();

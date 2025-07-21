@@ -11,6 +11,9 @@ enum InputDeviceType {
 struct InputDevice {
   InputDeviceType type;
 
+  // used for gamepads
+  int32 index;
+  
   int32 discreteCount;
     
   int32 *framesHeld;
@@ -143,6 +146,43 @@ enum InputMouseAnalogue : uint32 {
   MouseAnalogue_Scroll,
 
   Input_MouseAnalogueCount,
+};
+
+
+
+enum InputGamepadButton : uint32 {
+  Input_FaceA,
+  Input_FaceB,
+  Input_FaceX,
+  Input_FaceY,
+
+  Input_DPadLeft,
+  Input_DPadRight,
+  Input_DPadUp,
+  Input_DPadDown,
+
+  Input_LeftBumper,
+  Input_RightBumper,
+
+  Input_Start,
+  Input_Select,
+
+  Input_LeftStick,
+  Input_RightStick,
+
+  Input_GamepadButtonCount,
+};
+
+enum InputGamepadAnalogue : uint32 {
+  Input_LeftStickX,
+  Input_LeftStickY,
+
+  Input_RightStickX,
+  Input_RightStickY,
+
+  Input_LeftTrigger,
+  Input_RightTrigger,
+  Input_GamepadAnalogueCount,
 };
 #endif
 
@@ -405,6 +445,40 @@ static int32 MouseButtonMap[] = {
   -1, -1, -1, -1
 };
 
+
+static int32 GamepadButtonMap[] = {
+  Input_DPadUp,
+  Input_DPadRight,
+  Input_DPadDown,
+  Input_DPadLeft,
+
+  Input_FaceY,
+  Input_FaceB,
+  Input_FaceA,
+  Input_FaceX,
+
+  Input_LeftBumper,
+  -1,
+  
+  Input_RightBumper,
+  -1,
+
+  Input_Select,
+  -1,
+  Input_Start,
+
+  Input_LeftStick,
+  Input_RightStick,
+};
+
+static int32 GamepadAnalogueMap[] = {
+  Input_LeftStickX,
+  Input_LeftStickY,
+  Input_RightStickX,
+  Input_RightStickY,
+  Input_LeftTrigger,
+  Input_RightTrigger,
+};
 
 struct InputEvent {
     InputDevice *device;
