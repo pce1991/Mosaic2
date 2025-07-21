@@ -188,47 +188,8 @@ enum InputGamepadAnalogue : uint32 {
 
 // This is mapping
 // Wait this is supposed to map opposite: take the value we get from raylib and map to our key
-#if 0
-uint32 KeyTypeMap [] = {
-  KEY_A,
-  KEY_B,
-  KEY_C,
-  KEY_D,
-  KEY_E,
-  KEY_F,
-  KEY_G,
-  KEY_H,
-  KEY_I,
-  KEY_J,
-  KEY_K,
-  KEY_L,
-  KEY_M,
-  KEY_N,
-  KEY_O,
-  KEY_P,
-  KEY_Q,
-  KEY_R,
-  KEY_S,
-  KEY_T,
-  KEY_U,
-  KEY_V,
-  KEY_W,
-  KEY_X,
-  KEY_Y,
-  KEY_Z,
 
-  KEY_ONE,
-  KEY_TWO,
-  KEY_THREE,
-  KEY_FOUR,
-  KEY_FIVE,
-  KEY_SIX,
-  KEY_SEVEN,
-  KEY_EIGHT,
-  KEY_NINE,
-  KEY_ZERO,
-};
-#else
+#if 0
 static int32 KeyTypeMap[] = {
     -1,
     -1, // VK_LBUTTON
@@ -436,6 +397,34 @@ static int32 KeyTypeMap[] = {
 
     // VK_OEM_8...
 };
+#else
+
+int32 *KeyTypeMap = NULL;
+int32 KeyTypeMapLength = 0;
+
+// do this instead of an array literal just cause it's high value range
+// in raylib like 0-360
+void PopulateKeyTypeMap() {
+  KeyTypeMap[KEY_COMMA] = Input_Comma;
+
+  KeyTypeMap[KEY_LEFT] = Input_LeftArrow;
+  KeyTypeMap[KEY_RIGHT] = Input_RightArrow;
+  KeyTypeMap[KEY_UP] = Input_UpArrow;
+  KeyTypeMap[KEY_DOWN] = Input_DownArrow;
+
+  for (int i = 0; i < 26; i++) {
+    KeyTypeMap[KEY_A + i] = Input_A + i;  
+  }
+
+  for (int i = 0; i < 10; i++) {
+    KeyTypeMap[KEY_ZERO + i] = Input_0 + i;  
+  }
+
+  for (int i = 0; i < 12; i++) {
+    KeyTypeMap[KEY_F1 + i] = Input_F1 + i;  
+  }
+  
+}
 #endif
 
 static int32 MouseButtonMap[] = {

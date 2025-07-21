@@ -11,6 +11,11 @@ void AllocateInputManager(InputManager *input, MemoryArena *arena, int32 capacit
   input->charSize = 32;
   input->charCount = 0;
   input->inputChars = (char *)malloc(input->charSize);
+
+  KeyTypeMap = (int32 *)malloc(sizeof(int32) * (KEY_KP_EQUAL + 1));
+  KeyTypeMapLength = KEY_KP_EQUAL + 1;
+  
+  PopulateKeyTypeMap();
 }
 
 void AllocateInputDevice(InputDevice *device, InputDeviceType type, int32 discreteCount, int32 analogueCount, int32 index) {
@@ -72,7 +77,7 @@ void RaylibPushKeyboardEvents(InputManager *input, InputDevice *device) {
     InputEvent event = {};
     event.device = device;
 
-    if (key >= ArrayLength(uint32, KeyTypeMap)) {
+    if (key >= KeyTypeMapLength) {
       continue;
     }
     

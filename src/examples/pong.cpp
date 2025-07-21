@@ -193,16 +193,18 @@ void MosaicUpdate() {
     
     float32 moveDirection = 0;
     
-    if (InputHeld(Keyboard, Input_A)) {
+    if (InputHeld(Keyboard, Input_A) ||
+        InputHeld(Keyboard, Input_LeftArrow)) {
       moveDirection = -1;
     }
-    else if (InputHeld(Keyboard, Input_D)) {
+    else if (InputHeld(Keyboard, Input_D) ||
+             InputHeld(Keyboard, Input_RightArrow)) {
       moveDirection = 1;
     }
 
     {
       float32 trigger = InputAnalogue(Gamepad, Input_RightTrigger);
-      Print("%f", trigger);
+      //Print("%f", trigger);
     }
     
     {
