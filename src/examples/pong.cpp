@@ -180,7 +180,8 @@ void MosaicUpdate() {
   }
 
   
-  if (InputHeld(Keyboard, Input_Space)) {
+  if (InputPressed(Keyboard, Input_Space) ||
+      InputPressed(Gamepad, Input_FaceA)) {
     SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
       
     //DynamicArrayClear(&Game.balls);
@@ -191,7 +192,6 @@ void MosaicUpdate() {
     Paddle *paddle = &Game.paddles[0];
     
     float32 moveDirection = 0;
-
     
     if (InputHeld(Keyboard, Input_A)) {
       moveDirection = -1;
@@ -200,24 +200,19 @@ void MosaicUpdate() {
       moveDirection = 1;
     }
 
+    {
+      float32 trigger = InputAnalogue(Gamepad, Input_RightTrigger);
+      Print("%f", trigger);
+    }
     
     {
       float32 stick = InputAnalogue(Gamepad, Input_LeftStickX);
 
-      Print("stick value %f", stick);
+      //Print("stick value %f", stick);
 
       if (stick != 0) {
         moveDirection = stick;
       }
-    }
-
-
-    // HACK
-    if (IsKeyDown(KEY_LEFT)) {
-      moveDirection = -1;
-    }
-    else if (IsKeyDown(KEY_RIGHT)) {
-      moveDirection = 1;
     }
 
 

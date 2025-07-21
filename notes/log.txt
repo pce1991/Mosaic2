@@ -102,3 +102,6 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 @TODO: maybe we want to throw an error if we're looking for the input ID on the wrong device (like FaceA on Keyboard)
+
+
+@TODO: add debug drawing features for timed lines and such

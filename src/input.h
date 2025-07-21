@@ -447,6 +447,7 @@ static int32 MouseButtonMap[] = {
 
 
 static int32 GamepadButtonMap[] = {
+  -1,
   Input_DPadUp,
   Input_DPadRight,
   Input_DPadDown,

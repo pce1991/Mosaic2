@@ -164,11 +164,16 @@ void RaylibPushGamepadEvents(InputManager *input, InputDevice *device) {
     if (axis >= ArrayLength(uint32, GamepadAnalogueMap)) {
       continue;
     }
-    
+
     event.index = GamepadAnalogueMap[axis];
 
     event.value = GetGamepadAxisMovement(gamepadIndex, axis);
-
+    
+    if (event.index == Input_RightTrigger ||
+        event.index == Input_LeftTrigger) {
+      event.value = (event.value + 1.0f) / 2;
+    }
+    
     if (Abs(event.value) < deadzone) { continue; }
 
     PushInputEvent(input, event);
