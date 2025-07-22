@@ -3,6 +3,23 @@
 
 MemoryArena Arena = {};
 
+
+struct TileData {
+  vec3 color;
+  float32 rotation;
+  float32 scale;
+
+  // since these are randomized values I want to cache them
+  // so we can always set our targetColor to animate
+  // towards the original value. 
+  vec3 originalColor;
+  float32 originalScale;
+
+  vec3 targetColor;
+  float32 targetScale;
+};
+
+
 struct Ball {
   vec2 position;
   vec2 velocity;
@@ -24,6 +41,10 @@ struct Bumper {
   int32 health;
 
   float32 timeHit;
+
+  // easy way to just have share color/scale info across all the tiles
+  // that make up a bumper.
+  TileData tileData;
 };
 
 struct Paddle {
@@ -59,26 +80,11 @@ Texture2D testTexture = {};
 
 Texture2D bokeh = {};
 
-struct TileData {
-  vec3 color;
-  float32 rotation;
-  float32 scale;
-
-  // since these are randomized values I want to cache them
-  // so we can always set our targetColor to animate
-  // towards the original value. 
-  vec3 originalColor;
-  float32 originalScale;
-
-  vec3 targetColor;
-  float32 targetScale;
-};
-
 DynamicArray<TileData> backgroundTileData = {};
 
 void SpawnBall(vec2 position, vec2 velocity) {
   Ball ball = {};
-  ball.color = V3(0.2f, 0.8f, 0.5f);
+  ball.color = V3(0.15f, 0.75f, 0.2f);
 
   ball.position = position;
   ball.velocity = velocity;
@@ -93,6 +99,16 @@ void SpawnBall(vec2 position, vec2 velocity) {
 void SpawnBumper(vec2 position) {
   Bumper bumper = {};
   bumper.color = V3(0.2f, 0.3f, 0.8f);
+
+  // @TODO: make a function for this
+  bumper.tileData.originalScale = 1.5f;
+  bumper.tileData.originalColor = bumper.color;
+
+  bumper.tileData.scale = bumper.tileData.originalScale;
+  bumper.tileData.color = bumper.tileData.originalColor;
+
+  bumper.tileData.targetScale = bumper.tileData.originalScale;
+  bumper.tileData.targetColor = bumper.tileData.originalColor;
 
   bumper.position = position;
 
@@ -202,6 +218,11 @@ void DrawTextf(vec2 pos, float32 size, vec4 color, const char *fmt, ...) {
   va_end(args);
 }
 
+void TileDataMoveTowardsTarget(TileData *data, float32 rate) {
+  // @BUG: use MoveTowardsTarget instsead of lerp
+  data->color = Lerp(data->color, data->targetColor, rate * DeltaTime);
+  data->scale = Lerp(data->scale, data->targetScale, rate * DeltaTime);  
+}
 
 void MosaicUpdate() {
 
@@ -538,11 +559,9 @@ void MosaicUpdate() {
     for (int i = 0; i < backgroundTileData.count; i++) {
       TileData *data = &backgroundTileData[i];
 
-      float32 rate = 3.0f;
+      float32 rate = 1.0f;
 
-      // @BUG: should actually animate towards it and clamp
-      data->color = Lerp(data->color, data->targetColor, rate * DeltaTime);
-      data->scale = Lerp(data->scale, data->targetScale, rate * DeltaTime);
+      TileDataMoveTowardsTarget(data, rate);
     }
   }
 
@@ -553,34 +572,22 @@ void MosaicUpdate() {
 
     if (bumper->timeHit == 0) { continue; }
 
+    float32 duration = 0.3f;
+
     float32 sinceHit = Time - bumper->timeHit;
 
     float32 radius = bumper->radius;
     float32 radiusSq = radius * radius;
 
-    float32 duration = 0.4f;
-    for (int y = -radius; y <= radius; y++) {
-      for (int x = -radius; x <= radius; x++) {
-        int32 x_ = x + bumper->position.x;
-        int32 y_ = y + bumper->position.y;
-        int32 index = GetTileIndex(x_, y_);
-        float32 distSq = DistanceSq(V2(x_, y_), bumper->position);
-
-        if (index < 0) { continue; }
-
-        TileData *data = &backgroundTileData[index];
-
-        if (distSq >= radiusSq) { continue; }
-
-        if (sinceHit < duration) {
-          data->targetColor = V3(1.0f, 0.3f, 1.0f);
-          data->targetScale = 1.0;
-        }
-        else {
-          data->targetColor = data->originalColor;
-          data->targetScale = data->originalScale;
-        }
-      }
+    TileData *data = &bumper->tileData;
+    
+    if (sinceHit < duration) {
+      data->targetColor = V3(0.3f, 0.15f, 1.0f);
+      data->targetScale = 2.0f;
+    }
+    else {
+      data->targetColor = data->originalColor;
+      data->targetScale = data->originalScale;
     }
   }
 
@@ -659,12 +666,16 @@ void MosaicUpdate() {
           continue;
         }
 
-        float32 scale = (2.0 + (((1 + sinf(4 * Time + (index * 0.5f))) / 2) * 1.0f));
+        // we animate the tiles as we render them
+        TileDataMoveTowardsTarget(&bumper->tileData, 1.0f);
 
-        SetTileTint(position.x, position.y, bumper->color.r, bumper->color.g, bumper->color.b);
+        float32 scale = ((((1 + sinf(4 * Time + (index * 0.5f))) / 2) * 1.0f));
+
+        //SetTileTint(position.x, position.y, bumper->color.r, bumper->color.g, bumper->color.b);
+        SetTileTint(position.x, position.y, bumper->tileData.color);
         SetTileSprite(position.x, position.y, &bokeh);
-        SetTileScale(position.x, position.y, scale);
-        SetTileRotation(position.x, position.y, (Time + i) * 30);
+        SetTileScale(position.x, position.y, bumper->tileData.scale + scale);
+        SetTileRotation(position.x, position.y, (Time + index) * 30);
 
         index++;
       }

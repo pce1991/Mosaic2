@@ -59,6 +59,13 @@ inline void SetTileTint(int32 x, int32 y, vec4 tint) {
   }
 }
 
+inline void SetTileTint(int32 x, int32 y, vec3 tint) {
+  MTile*t = GetTile(x, y);
+  if (t) {
+    t->tint = V4(tint, 1.0f);
+  }
+}
+
 
 inline void SetTileTint(int32 x, int32 y, float32 r, float32 g, float32 b) {
   MTile*t = GetTile(x, y);
@@ -78,6 +85,13 @@ inline void SetTileTint(vec2 position, vec4 tint) {
   MTile*t = GetTile(position);
   if (t) {
     t->tint = tint;
+  }
+}
+
+inline void SetTileTint(vec2 position, vec3 tint) {
+  MTile*t = GetTile(position);
+  if (t) {
+    t->tint = V4(tint, 1.0f);
   }
 }
 
