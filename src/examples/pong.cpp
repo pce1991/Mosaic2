@@ -444,8 +444,9 @@ void MosaicUpdate() {
             continue;
           }
 
-          data->targetColor = V3(0.7f, 0.05f, 0.2f);
-          data->targetScale = 2.0;
+          data->targetColor = V3(0.5f, 0.05f, 0.3f);
+          //data->targetColor = V3(0.7f, 0.05f, 0.2f);
+          data->targetScale = 1.0;
         }
       }
     }
@@ -468,7 +469,7 @@ void MosaicUpdate() {
 
           data->targetColor = V3(0.4f, 0.05f, 0.2f);
           //data->targetColor = V3(0.7f, 1.0f, 1.0f);
-          data->targetScale = 0.3;
+          data->targetScale = 1.0;
         }
 
         index++;
