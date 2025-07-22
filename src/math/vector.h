@@ -1488,3 +1488,36 @@ inline void ClampLength(vec4 *v, float32 maxLength) {
         *v = (*v / len) * maxLength;
     }
 }
+
+
+inline vec2 MoveTowards(vec2 n, vec2 target, float32 travelDist) {
+  if (n == target) { return n; }
+
+  vec2 diff = target - n;
+  float32 distance = Length(diff);
+  vec2 dir = diff / distance;
+
+  vec2 move = dir * travelDist;
+  move = ClampLength(move, distance);
+  
+  n = n + move;
+
+  return n;
+}
+
+inline vec3 MoveTowards(vec3 n, vec3 target, float32 travelDist) {
+  if (n == target) { return n; }
+
+  vec3 diff = target - n;
+  float32 distance = Length(diff);
+  vec3 dir = diff / distance;
+
+  vec3 move = dir * travelDist;
+  move = ClampLength(move, distance);
+  
+  n = n + move;
+
+  return n;
+}
+
+

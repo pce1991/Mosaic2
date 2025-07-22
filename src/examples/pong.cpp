@@ -33,6 +33,7 @@ struct GameMem {
   float32 spawnTimer;
 
   int32 lastScoreSpawned;
+  bool spawnedAtScore;
   
   Paddle paddles[2];
 
@@ -49,6 +50,15 @@ struct TileData {
   vec3 color;
   float32 rotation;
   float32 scale;
+
+  // since these are randomized values I want to cache them
+  // so we can always set our targetColor to animate
+  // towards the original value. 
+  vec3 originalColor;
+  float32 originalScale;
+
+  vec3 targetColor;
+  float32 targetScale;
 };
 
 DynamicArray<TileData> backgroundTileData = {};
@@ -86,7 +96,8 @@ void MosaicInit() {
   for (int y = 0; y < Mosaic->gridHeight; y++) {
     for (int x = 0; x < Mosaic->gridWidth; x++) {
       TileData data = {};
-      data.scale = RandfRange(0.0f, 0.25f);
+      data.scale = RandfRange(0.15f, 0.25f);
+      //data.scale = 1.0f;
       data.rotation = RandfRange(0, 360);
 
       vec3 hsv = {
@@ -95,6 +106,9 @@ void MosaicInit() {
         .z = RandfRange(0.1f, 0.4f),
       };
       data.color = HSVToRGB(hsv);
+
+      data.originalColor = data.color;
+      data.originalScale = data.scale;
 
       PushBack(&backgroundTileData, data);
     }
@@ -106,7 +120,7 @@ void MosaicInit() {
 
   {
     Game.paddles[0] = {
-      .width = 11,
+      .width = 13,
       .height = 3,
       .position = V2(22, PaddleFloor),
       .color = V3(1, 1, 1)
@@ -175,11 +189,32 @@ void MosaicUpdate() {
   }
 
   {
-    int32 scoreDelta = Game.score - Game.lastScoreSpawned;
+    int32 nextBallScore = 5;
+    bool canSpawn = true;
 
-    if (scoreDelta >= 5) {
+    if (Game.score < 5) {
+      nextBallScore = 3;
+    }
+    else if (Game.score < 10) {
+      nextBallScore = 10;
+    }
+    else if (Game.score < 15) {
+      nextBallScore = 15;
+    }
+    else {
+      //nextBallScore = 20;
+      canSpawn = false;
+    }
+
+    // we check >= because we may have score multiple points on one
+    // frame and don't want to miss our spawn.
+    // @BUG: technically if we score enough points to spawn two balls
+    // on one frame we'll only spawn one. 
+    if (Game.score >= nextBallScore && canSpawn &&
+        !Game.spawnedAtScore) {
       SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
       Game.lastScoreSpawned = Game.score;
+      Game.spawnedAtScore = true;
     }
   }
 
@@ -216,8 +251,9 @@ void MosaicUpdate() {
     }
 
 
-    float32 maxSpeed = 60;
-    float32 accel = 500;
+    float32 maxVertSpeed = 60;
+    float32 maxHorzSpeed = 80;
+    float32 accel = 700;
     
     if (moveDirection != 0) {
       paddle->velocity.x += accel * moveDirection * DeltaTime;
@@ -235,17 +271,17 @@ void MosaicUpdate() {
       // @TODO: maybe do this as different forces summing to
       // a velocity? 
       if (paddle->grounded) {
-        paddle->velocity.y = 180;
+        paddle->velocity.y = 240;
         paddle->grounded = false;
       }
     }
 
     if (!paddle->grounded) {
-      float32 gravity = 70;
+      float32 gravity = 100;
       paddle->velocity.y += -gravity * DeltaTime;
     }
 
-    paddle->velocity = Clamp(paddle->velocity, V2(-maxSpeed), V2(maxSpeed));
+    paddle->velocity = Clamp(paddle->velocity, V2(-maxHorzSpeed, -maxVertSpeed), V2(maxHorzSpeed, maxVertSpeed));
 
     paddle->position = paddle->position + (paddle->velocity * DeltaTime);
     
@@ -288,17 +324,8 @@ void MosaicUpdate() {
 
       vec2 ballCenter = Lerp(ballMin, ballMax, 0.5f);
 
-
-      // @TODO: we need to check the position of the ball at the start of this frame!
-      // Ray2D velRay;
-      // velRay.origin = ballCenter;
-      // velRay.direction = ball->velocity;
-
-      // float32 tHit;
-      // if (RaycastAABB(paddleMin, paddleMax, velRay, &tHit)) {
-        
-      // }
-
+      // @BUG: need to make sure that we get repeat score by
+      // overlapping on multiple frames with the same ball. 
       vec2 dir = V2(0);
       if (TestAABBAABB(ballMin, ballMax, paddleMin, paddleMax, &dir)) {
         ball->position = ball->position + dir;
@@ -316,6 +343,7 @@ void MosaicUpdate() {
         }
 
         Game.score++;
+        Game.spawnedAtScore = false;
       }
     }
   }
@@ -375,6 +403,87 @@ void MosaicUpdate() {
       if (ball->health <= 0) {
         RemoveAtIndex(&Game.balls, i);
       }
+    }
+  }
+
+  {
+    
+    // set the target values based on distance from the balls
+    float32 radius = 4;
+    float32 radiusSq = radius * radius;
+
+    for (int i = 0; i < backgroundTileData.count; i++) {
+      TileData *data = &backgroundTileData[i];
+
+      data->targetColor = data->originalColor;
+      data->targetScale = data->originalScale;
+    }
+
+    // @PERF: instead of looping over tile, loop over the balls
+    // and then only grab the tiles around them in a radius
+#if 1
+
+    for (int i = 0; i < Game.balls.count; i++) {
+      Ball *ball = &Game.balls[i];
+
+      for (int y = -radius; y <= radius; y++) {
+        for (int x = -radius; x <= radius; x++) {
+          int32 x_ = x + ball->position.x;
+          int32 y_ = y + ball->position.y;
+          int32 index = GetTileIndex(x_, y_);
+
+          if (index < 0) {
+            continue;
+          }
+
+          TileData *data = &backgroundTileData[index];
+          
+          float32 distSq = DistanceSq(V2(x_, y_), ball->position);
+
+          if (distSq >= radiusSq) {
+            continue;
+          }
+
+          data->targetColor = V3(0.7f, 0.05f, 0.2f);
+          data->targetScale = 2.0;
+        }
+      }
+    }
+#else
+    int32 index = 0;
+    for (int y = 0; y < Mosaic->gridHeight; y++) {
+      for (int x = 0; x < Mosaic->gridWidth; x++) {
+        TileData *data = &backgroundTileData[index];
+
+        vec2 position = V2(x, y);
+
+        for (int i = 0; i < Game.balls.count; i++) {
+          Ball *ball = &Game.balls[i];
+
+          float32 distSq = DistanceSq(position, ball->position);
+
+          if (distSq >= radiusSq) {
+            continue;
+          }
+
+          data->targetColor = V3(0.4f, 0.05f, 0.2f);
+          //data->targetColor = V3(0.7f, 1.0f, 1.0f);
+          data->targetScale = 0.3;
+        }
+
+        index++;
+      }
+    }
+#endif
+
+    for (int i = 0; i < backgroundTileData.count; i++) {
+      TileData *data = &backgroundTileData[i];
+
+      float32 rate = 3.0f;
+
+      // @BUG: should actually animate towards it and clamp
+      data->color = Lerp(data->color, data->targetColor, rate * DeltaTime);
+      data->scale = Lerp(data->scale, data->targetScale, rate * DeltaTime);
     }
   }
 

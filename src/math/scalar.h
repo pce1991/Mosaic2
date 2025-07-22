@@ -428,20 +428,20 @@ inline float32 Dampen(float32 n, float32 t) {
 }
 
 inline float32 MoveTowards(float32 n, float32 target, float32 delta) {
-    if (n == target) { return n; }
+  if (n == target) { return n; }
     
-    n = n + delta;
+  n = n + delta;
 
-    if (delta < 0) {
-        if (n < target) {
-            n = target;
-        }
+  if (delta < 0) {
+    if (n < target) {
+      n = target;
     }
-    else {
-        if (n > target) {
-            n = target;
-        }
+  }
+  else {
+    if (n > target) {
+      n = target;
     }
+  }
     
-    return n;
+  return n;
 }

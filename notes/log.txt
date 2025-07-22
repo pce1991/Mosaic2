@@ -105,3 +105,8 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 @TODO: add debug drawing features for timed lines and such
+
+
+@DESIGN: on keepy uppy would be cool to have some way to control the speed because I feel like there's a lot of clusters and it's impossible to keep 5 up in the air
+
+@TODO: do the target color/scale/rotation thing 

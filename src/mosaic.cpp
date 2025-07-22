@@ -12,7 +12,17 @@ void MosaicInternalInit() {
     
   SetMosaicGridSize(16, 16);
 }
+
+inline int32 GetTileIndex(int32 x, int32 y) {
+  if (x < 0 || x >= Mosaic->gridWidth) {
+    return -1;
+  }
+  if (y < 0 || y >= Mosaic->gridHeight) {
+    return -1;
+  }
     
+  return (y * Mosaic->gridWidth) + x;
+}
     
 inline MTile* GetTile(int32 x, int32 y) {
   if (x < 0 || x >= Mosaic->gridWidth) {
@@ -22,7 +32,6 @@ inline MTile* GetTile(int32 x, int32 y) {
     return NULL;
   }
     
-  // TODO: clamp these in case they're out of bounds, so we don't crash
   int32 index = (y * Mosaic->gridWidth) + x;
   return &Mosaic->tiles[index];
 }
