@@ -1521,3 +1521,8 @@ inline vec3 MoveTowards(vec3 n, vec3 target, float32 travelDist) {
 }
 
 
+vec2 Reflect(vec2 v, vec2 n) {
+  float dot = v.x * n.x + v.y * n.y;
+  return V2(v.x - 2 * dot * n.x,
+            v.y - 2 * dot * n.y);
+}

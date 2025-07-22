@@ -414,6 +414,8 @@ void PopulateKeyTypeMap() {
 
   KeyTypeMap[KEY_SPACE] = Input_Space;
 
+  KeyTypeMap[KEY_SLASH] = Input_Slash;
+
   for (int i = 0; i < 26; i++) {
     KeyTypeMap[KEY_A + i] = Input_A + i;  
   }

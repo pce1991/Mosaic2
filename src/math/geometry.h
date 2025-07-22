@@ -686,6 +686,29 @@ inline bool RaycastAABB(vec2 aabbMin, vec2 aabbMax, Ray3D ray, float32 *tMin, bo
     return true;
 }
 
+vec2 ClosestPointOnCirlce(vec2 pt, vec2 center, float32 radius) {
+  vec2 diff = pt - center;
+  vec2 dir = Normalize(diff);
+
+  return center + (dir * radius);
+}
+
+bool TestCircleCircle(vec2 centerA, float32 radiusA, vec2 centerB, float32 radiusB) {
+  float32 radiusSum = radiusA + radiusB;
+  float32 radiusSumSq = radiusSum * radiusSum;
+
+  float32 distSq = DistanceSq(centerA, centerB);
+
+  if (distSq > radiusSumSq) { return false; }
+
+  return true;
+}
+
+// writes out vector to separate circle from box
+// bool TestCircleAABB(vec2 center, float32 radius, vec2 min, vec2 max, vec2 *dir) {
+
+// }
+
 bool TestAABBAABB(vec2 minA, vec2 maxA, vec2 minB, vec2 maxB, vec2 *dir) {
     // Is the bug that the positions can be negative?
     float32 lengthX = Min(maxA.x, maxB.x) - Max(minA.x, minB.x);

@@ -80,8 +80,10 @@ void RaylibPushKeyboardEvents(InputManager *input, InputDevice *device) {
     if (key >= KeyTypeMapLength) {
       continue;
     }
-    
+
     event.index = KeyTypeMap[key];
+
+    if (event.index < 0) { continue; }
 
     if (IsKeyPressed(key) ||
         IsKeyDown(key)) {
