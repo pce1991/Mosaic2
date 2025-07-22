@@ -412,6 +412,8 @@ void PopulateKeyTypeMap() {
   KeyTypeMap[KEY_UP] = Input_UpArrow;
   KeyTypeMap[KEY_DOWN] = Input_DownArrow;
 
+  KeyTypeMap[KEY_SPACE] = Input_Space;
+
   for (int i = 0; i < 26; i++) {
     KeyTypeMap[KEY_A + i] = Input_A + i;  
   }
@@ -423,7 +425,6 @@ void PopulateKeyTypeMap() {
   for (int i = 0; i < 12; i++) {
     KeyTypeMap[KEY_F1 + i] = Input_F1 + i;  
   }
-  
 }
 #endif
 

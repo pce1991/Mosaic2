@@ -22,6 +22,8 @@ struct Paddle {
   vec2 position;
   vec2 velocity;
 
+  bool grounded;
+
   vec3 color;
 };
 
@@ -65,6 +67,8 @@ void SpawnBall(vec2 position, vec2 velocity) {
   PushBack(&Game.balls, ball);
 }
 
+float32 PaddleFloor = 12;
+
 void MosaicInit() {
   testTexture = LoadTexture("data/glube.png");
   bokeh = LoadTexture("data/textures/bokeh/waves_alpha2.png");
@@ -104,7 +108,7 @@ void MosaicInit() {
     Game.paddles[0] = {
       .width = 11,
       .height = 3,
-      .position = V2(22, 12),
+      .position = V2(22, PaddleFloor),
       .color = V3(1, 1, 1)
     };
   }
@@ -180,13 +184,7 @@ void MosaicUpdate() {
   }
 
   
-  if (InputPressed(Keyboard, Input_Space) ||
-      InputPressed(Gamepad, Input_FaceA)) {
-    SpawnBall(V2(40, 120), V2(RandfRange(-10, 10), -40));
-      
-    //DynamicArrayClear(&Game.balls);
-  }
-
+  
   // update paddle movement
   {
     Paddle *paddle = &Game.paddles[0];
@@ -231,9 +229,30 @@ void MosaicUpdate() {
       paddle->velocity.x = Dampen(paddle->velocity.x, decel * DeltaTime);
     }
 
+    if (InputPressed(Keyboard, Input_Space) ||
+        InputPressed(Gamepad, Input_FaceA)) {
+
+      // @TODO: maybe do this as different forces summing to
+      // a velocity? 
+      if (paddle->grounded) {
+        paddle->velocity.y = 180;
+        paddle->grounded = false;
+      }
+    }
+
+    if (!paddle->grounded) {
+      float32 gravity = 70;
+      paddle->velocity.y += -gravity * DeltaTime;
+    }
+
     paddle->velocity = Clamp(paddle->velocity, V2(-maxSpeed), V2(maxSpeed));
 
     paddle->position = paddle->position + (paddle->velocity * DeltaTime);
+    
+    if (paddle->position.y <= PaddleFloor) {
+      paddle->position.y = PaddleFloor;
+      paddle->grounded = true;
+    }
   }
 
   {
@@ -289,22 +308,14 @@ void MosaicUpdate() {
         float32 swipeScale = 1.1f;
         ball->velocity.x += paddle->velocity.x * swipeScale;
 
-        //ball->health--;
+        // dont add the velocity if the paddle is moving down in same
+        // direction as the ball.
+        if (paddle->velocity.y > 0) {
+          float32 bounceScale = 0.8f;
+          ball->velocity.y += paddle->velocity.y * bounceScale;
+        }
 
         Game.score++;
-
-        // if (ball->health == 2) {
-        //   vec3 hsv = {
-        //     .x = 32,
-        //     .y = RandfRange(0.5f, 0.7f),
-        //     .z = RandfRange(0.3f, 0.6f),
-        //   };
-          
-        //   ball->color = HSVToRGB(hsv);
-        // }
-        // else if (ball->health == 1) {
-        //   ball->color = V3(0.7f, 0.3f, 0.3f);
-        // }
       }
     }
   }
