@@ -22,6 +22,8 @@ struct Bumper {
   vec3 color;
 
   int32 health;
+
+  float32 timeHit;
 };
 
 struct Paddle {
@@ -394,6 +396,8 @@ void MosaicUpdate() {
           ball->position = ball->position + (dir * bumper->radius);
 
           ball->velocity = Reflect(ball->velocity, dir);
+
+          bumper->timeHit = Time;
         }
       }
     }
@@ -539,6 +543,44 @@ void MosaicUpdate() {
       // @BUG: should actually animate towards it and clamp
       data->color = Lerp(data->color, data->targetColor, rate * DeltaTime);
       data->scale = Lerp(data->scale, data->targetScale, rate * DeltaTime);
+    }
+  }
+
+  // @TODO: think I want to animate these properties on the bumper
+  // itself and not the tiles around it? 
+  for (int i = 0; i < Game.bumpers.count; i++) {
+    Bumper *bumper = &Game.bumpers[i];
+
+    if (bumper->timeHit == 0) { continue; }
+
+    float32 sinceHit = Time - bumper->timeHit;
+
+    float32 radius = bumper->radius;
+    float32 radiusSq = radius * radius;
+
+    float32 duration = 0.4f;
+    for (int y = -radius; y <= radius; y++) {
+      for (int x = -radius; x <= radius; x++) {
+        int32 x_ = x + bumper->position.x;
+        int32 y_ = y + bumper->position.y;
+        int32 index = GetTileIndex(x_, y_);
+        float32 distSq = DistanceSq(V2(x_, y_), bumper->position);
+
+        if (index < 0) { continue; }
+
+        TileData *data = &backgroundTileData[index];
+
+        if (distSq >= radiusSq) { continue; }
+
+        if (sinceHit < duration) {
+          data->targetColor = V3(1.0f, 0.3f, 1.0f);
+          data->targetScale = 1.0;
+        }
+        else {
+          data->targetColor = data->originalColor;
+          data->targetScale = data->originalScale;
+        }
+      }
     }
   }
 
