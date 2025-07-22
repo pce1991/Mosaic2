@@ -9,14 +9,17 @@ struct TileData {
   float32 rotation;
   float32 scale;
 
-  // since these are randomized values I want to cache them
-  // so we can always set our targetColor to animate
-  // towards the original value. 
+  // since these might be randomized values I want to cache them
+  // so we can always set our targetColor to animate back
+  // towards the original value without having to regenerate
+  // them. 
   vec3 originalColor;
   float32 originalScale;
 
   vec3 targetColor;
   float32 targetScale;
+
+  // @TODO: set scales per attribute
 };
 
 
@@ -82,6 +85,21 @@ Texture2D bokeh = {};
 
 DynamicArray<TileData> backgroundTileData = {};
 
+TileData MakeTileData(vec3 color, float32 scale) {
+  TileData tileData = {};
+  
+  tileData.originalScale = scale;
+  tileData.originalColor = color;
+
+  tileData.scale = tileData.originalScale;
+  tileData.color = tileData.originalColor;
+
+  tileData.targetScale = tileData.originalScale;
+  tileData.targetColor = tileData.originalColor;
+
+  return tileData;
+}
+
 void SpawnBall(vec2 position, vec2 velocity) {
   Ball ball = {};
   ball.color = V3(0.15f, 0.75f, 0.2f);
@@ -99,16 +117,8 @@ void SpawnBall(vec2 position, vec2 velocity) {
 void SpawnBumper(vec2 position) {
   Bumper bumper = {};
   bumper.color = V3(0.2f, 0.3f, 0.8f);
-
-  // @TODO: make a function for this
-  bumper.tileData.originalScale = 1.5f;
-  bumper.tileData.originalColor = bumper.color;
-
-  bumper.tileData.scale = bumper.tileData.originalScale;
-  bumper.tileData.color = bumper.tileData.originalColor;
-
-  bumper.tileData.targetScale = bumper.tileData.originalScale;
-  bumper.tileData.targetColor = bumper.tileData.originalColor;
+  
+  bumper.tileData = MakeTileData(bumper.color, 1.5f);
 
   bumper.position = position;
 
