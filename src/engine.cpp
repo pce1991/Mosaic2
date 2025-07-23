@@ -130,50 +130,51 @@ struct SpriteBatchData {
 };
 
 void TextureBatchRender(SpriteBatchData *sprites, int32 spriteCount, Texture texture) {
-  // Set texture once
+  rlSetTexture(0);
   rlSetTexture(texture.id);
-
-  // Begin custom textured quad drawing
   rlBegin(RL_QUADS);
 
-  // For each sprite...
   for (int i = 0; i < spriteCount; i++) {
     vec2 pos = sprites[i].position;
     float rotation = sprites[i].rotation;
     float scale = sprites[i].scale;
     Color tint = sprites[i].tint;
 
-    Rectangle src = sprites[i].srcRect; // Portion of the texture
-    Vector2 origin = {src.width / 2, src.height / 2};
+    float size = 10.0f * scale;  // <- desired quad width in world units
+    float halfSize = size / 2.0f;
 
-    // Calculate transformed corners
+    // Maintain texture aspect ratio
+    float aspect = (float)texture.height / (float)texture.width;
+    float halfWidth = halfSize;
+    float halfHeight = halfSize * aspect;
+
     float cosr = cosf(rotation);
     float sinr = sinf(rotation);
 
-    float sw = src.width * scale;
-    float sh = src.height * scale;
-
-    // 4 corners relative to origin
+    // ccw winding
     Vector2 corners[4] = {
-      {-origin.x, -origin.y},
-      { src.width - origin.x, -origin.y},
-      { src.width - origin.x, src.height - origin.y},
-      {-origin.x, src.height - origin.y}
+      { -halfWidth,  halfHeight },  // Bottom-left
+      {  halfWidth,  halfHeight },  // Bottom-right
+      {  halfWidth, -halfHeight },  // Top-right
+      { -halfWidth, -halfHeight }   // Top-left
     };
 
-    // Transform + draw each vertex
+    Vector2 uvs[4] = {
+      { 0.0f, 1.0f },  // Bottom-left
+      { 1.0f, 1.0f },  // Bottom-right
+      { 1.0f, 0.0f },  // Top-right
+      { 0.0f, 0.0f }   // Top-left
+    };
+
     for (int j = 0; j < 4; j++) {
-      float x = corners[j].x * scale;
-      float y = corners[j].y * scale;
+      float x = corners[j].x;
+      float y = corners[j].y;
 
       float tx = pos.x + x * cosr - y * sinr;
       float ty = pos.y + x * sinr + y * cosr;
 
-      float u = (j == 0 || j == 3) ? src.x / texture.width : (src.x + src.width) / texture.width;
-      float v = (j == 0 || j == 1) ? src.y / texture.height : (src.y + src.height) / texture.height;
-
       rlColor4ub(tint.r, tint.g, tint.b, tint.a);
-      rlTexCoord2f(u, v);
+      rlTexCoord2f(uvs[j].x, uvs[j].y);
       rlVertex2f(tx, ty);
     }
   }
@@ -254,7 +255,7 @@ int main(void)
 
   Engine.perlinNoise= GenImagePerlinNoise(Platform.screenWidth, Platform.screenHeight, 50, 50, 4.0f);
 
-  SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+  //SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
     
   Camera2D camera = { 0 };
@@ -423,11 +424,13 @@ int main(void)
     Texture *texture = NULL;
     for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
       MTile *tile = &Mosaic->tiles[i];
-      
-      // @HACK: really this should probably all be baked into one big atlas
-      texture = tile->sprite;
 
-      vec2 position = V2(tile->position.x, tile->position.y);
+      if (texture == NULL) {
+        // @HACK: really this should probably all be baked into one big atlas
+        texture = tile->sprite;
+      }
+
+      vec2 position = GridPositionToWorldPosition(tile->position);
 
       SpriteBatchData *sprite = &sprites[i];
       sprite->position = position;

@@ -134,6 +134,7 @@ float32 PaddleFloor = 12;
 void MosaicInit() {
   testTexture = LoadTexture("data/glube.png");
   bokeh = LoadTexture("data/textures/bokeh/waves_alpha2.png");
+  //bokeh = LoadTexture("data/test.png");
   
   SetMosaicGridSize(80, 120);
   //SetMosaicGridSize(8, 8);
@@ -172,11 +173,11 @@ void MosaicInit() {
   SpawnBall(V2(40, 80), V2(0, -30));
 
   SpawnBumper(V2(25, 65));
-  SpawnBumper(V2(60, 50));
+  // SpawnBumper(V2(60, 50));
 
   {
     Game.paddles[0] = {
-      .width = 13,
+      .width = 18,
       .height = 3,
       .position = V2(22, PaddleFloor),
       .color = V3(1, 1, 1)

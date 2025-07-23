@@ -117,3 +117,11 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 - @TODO: drawing the sprites seems to take a lot of time. I wonder if I'm not doing batching correctly
   Oh yeah it's a ton of individiual draw calls wtf?
+  The positions seem totally whacked out
+  A) the range is too high
+  B) the verts are way too far apart, like -900 -> 100
+
+
+- @BUG: weirdly the bumpers seem to draw with a different texture, until I take a screenshot??? It's more round. I actually like the look but idk why it's happening....
+  
+
