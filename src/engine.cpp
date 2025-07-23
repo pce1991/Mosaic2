@@ -419,6 +419,12 @@ int main(void)
     }
 #else
 
+    for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
+      MTile *tile = &Mosaic->tiles[i];
+          
+      DrawTile(tile->position, tile->color);
+    }
+
     SpriteBatchData *sprites = PushArray(FrameMem, SpriteBatchData, Mosaic->tileCapacity);
 
     Texture *texture = NULL;
