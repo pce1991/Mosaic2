@@ -375,10 +375,7 @@ int main(void)
         
       for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
         MTile *tile = &Mosaic->tiles[i];
-          
-        DrawTile(tile->position, tile->color);
 
-#if 1
         if (tile->sprite != NULL) {
           Texture2D *sprite = tile->sprite;
           pos = GridPositionToWorldPosition(tile->position);
@@ -420,12 +417,14 @@ int main(void)
           // @BUG: 
           //DrawCircle(dest.x, dest.y, 1, WHITE);
         }
-#endif
       }
     }
 #else
 
-#if 0
+#if 1
+    // @TODO: sort thru all the sprites used and batch accordingly.
+    // @TODO: support the ability to sample from the textures, which means we've got to
+    // remap our uv coordinates!
     SpriteBatchData *sprites = PushArray(FrameMem, SpriteBatchData, Mosaic->tileCapacity);
 
     Texture *texture = NULL;
@@ -455,13 +454,15 @@ int main(void)
       Rectangle src = {};
       src.x = 0;
       src.y = 0;
-      src.width = texture->width ;
+      src.width = texture->width;
       src.height = texture->height;
 
       sprite->srcRect = src;
     }
 
-    TextureBatchRender(sprites, Mosaic->tileCapacity, *texture);
+    if (texture != NULL) {
+      TextureBatchRender(sprites, Mosaic->tileCapacity, *texture);
+    }
 #endif
     
 #endif
