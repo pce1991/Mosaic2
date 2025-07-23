@@ -422,9 +422,10 @@ int main(void)
     for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
       MTile *tile = &Mosaic->tiles[i];
           
-      DrawTile(tile->position, tile->color);
+      DrawTile(tile->position, tile->tint);
     }
 
+#if 0
     SpriteBatchData *sprites = PushArray(FrameMem, SpriteBatchData, Mosaic->tileCapacity);
 
     Texture *texture = NULL;
@@ -459,6 +460,7 @@ int main(void)
 
       sprite->srcRect = src;
     }
+#endif
 
     TextureBatchRender(sprites, Mosaic->tileCapacity, *texture);
 #endif
