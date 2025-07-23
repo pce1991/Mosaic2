@@ -113,3 +113,7 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 @PERF: the stuff I'm doing in keep_uppy really taps out at 70fps
+
+
+- @TODO: drawing the sprites seems to take a lot of time. I wonder if I'm not doing batching correctly
+  Oh yeah it's a ton of individiual draw calls wtf?

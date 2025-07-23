@@ -80,6 +80,7 @@ void Print(const char *fmt, ...) {
 
 #include "mosaic.cpp"
 
+#include "rlgl.h"    // Required for rlBegin, rlSetTexture, rlVertex2f, etc.
 
 struct PlatformMem {
   int32 screenWidth;
@@ -102,6 +103,7 @@ struct EngineMem {
   vec2 mousePositionNorm;
 
   MemoryArena arena;
+  MemoryArena frameMem;
 
   InputManager input;
 
@@ -114,6 +116,71 @@ InputDevice *Gamepads[4];
 InputDevice *Gamepad = NULL;
 
 EngineMem Engine = {};
+
+MemoryArena *FrameMem = NULL;
+
+struct SpriteBatchData {
+  vec2 position;
+  float32 rotation;
+  float32 scale;
+
+  Color tint;
+
+  Rectangle srcRect;
+};
+
+void TextureBatchRender(SpriteBatchData *sprites, int32 spriteCount, Texture texture) {
+  // Set texture once
+  rlSetTexture(texture.id);
+
+  // Begin custom textured quad drawing
+  rlBegin(RL_QUADS);
+
+  // For each sprite...
+  for (int i = 0; i < spriteCount; i++) {
+    vec2 pos = sprites[i].position;
+    float rotation = sprites[i].rotation;
+    float scale = sprites[i].scale;
+    Color tint = sprites[i].tint;
+
+    Rectangle src = sprites[i].srcRect; // Portion of the texture
+    Vector2 origin = {src.width / 2, src.height / 2};
+
+    // Calculate transformed corners
+    float cosr = cosf(rotation);
+    float sinr = sinf(rotation);
+
+    float sw = src.width * scale;
+    float sh = src.height * scale;
+
+    // 4 corners relative to origin
+    Vector2 corners[4] = {
+      {-origin.x, -origin.y},
+      { src.width - origin.x, -origin.y},
+      { src.width - origin.x, src.height - origin.y},
+      {-origin.x, src.height - origin.y}
+    };
+
+    // Transform + draw each vertex
+    for (int j = 0; j < 4; j++) {
+      float x = corners[j].x * scale;
+      float y = corners[j].y * scale;
+
+      float tx = pos.x + x * cosr - y * sinr;
+      float ty = pos.y + x * sinr + y * cosr;
+
+      float u = (j == 0 || j == 3) ? src.x / texture.width : (src.x + src.width) / texture.width;
+      float v = (j == 0 || j == 1) ? src.y / texture.height : (src.y + src.height) / texture.height;
+
+      rlColor4ub(tint.r, tint.g, tint.b, tint.a);
+      rlTexCoord2f(u, v);
+      rlVertex2f(tx, ty);
+    }
+  }
+
+  rlEnd();
+  rlSetTexture(0);
+}
 
 //------------------------------------------------------------------------------------
 // Program main entry point
@@ -129,6 +196,9 @@ int main(void)
   InitWindow(Platform.screenWidth, Platform.screenHeight, "raylib [core] example - basic window");
 
   AllocateMemoryArena(&Engine.arena, Megabytes(1));
+  AllocateMemoryArena(&Engine.frameMem, Megabytes(1));
+
+  FrameMem = &Engine.frameMem;
 
   char *workingDirectory = (char *)GetWorkingDirectory();
 
@@ -184,7 +254,7 @@ int main(void)
 
   Engine.perlinNoise= GenImagePerlinNoise(Platform.screenWidth, Platform.screenHeight, 50, 50, 4.0f);
 
-  //SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+  SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
   //--------------------------------------------------------------------------------------
     
   Camera2D camera = { 0 };
@@ -291,6 +361,7 @@ int main(void)
     // @TODO: Mosaic should be accumulating a list of draw text commands 
     // which we iterate and call the correct stuff for
 
+#if 0
     {
       MTile *tiles = Mosaic->tiles;
       vec2 pos;
@@ -345,6 +416,44 @@ int main(void)
 #endif
       }
     }
+#else
+
+    SpriteBatchData *sprites = PushArray(FrameMem, SpriteBatchData, Mosaic->tileCapacity);
+
+    Texture *texture = NULL;
+    for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
+      MTile *tile = &Mosaic->tiles[i];
+      
+      // @HACK: really this should probably all be baked into one big atlas
+      texture = tile->sprite;
+
+      vec2 position = V2(tile->position.x, tile->position.y);
+
+      SpriteBatchData *sprite = &sprites[i];
+      sprite->position = position;
+      sprite->rotation = tile->rotation;
+      sprite->scale = tile->scale;
+
+      Color c = {};
+      c.r = tile->tint.r * 255;
+      c.b = tile->tint.b * 255;
+      c.g = tile->tint.g * 255;
+      c.a = tile->tint.a * 255;
+
+      sprite->tint = c;
+
+      Rectangle src = {};
+      src.x = 0;
+      src.y = 0;
+      src.width = texture->width ;
+      src.height = texture->height;
+
+      sprite->srcRect = src;
+    }
+
+    TextureBatchRender(sprites, Mosaic->tileCapacity, *texture);
+#endif
+    
 
     EndBlendMode();
 
@@ -358,6 +467,8 @@ int main(void)
 
     EndDrawing();
     //----------------------------------------------------------------------------------
+
+    ClearMemoryArena(&Engine.frameMem);
   }
 
   // De-Initialization
