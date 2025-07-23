@@ -110,3 +110,6 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 @DESIGN: on keepy uppy would be cool to have some way to control the speed because I feel like there's a lot of clusters and it's impossible to keep 5 up in the air
 
 @TODO: do the target color/scale/rotation thing 
+
+
+@PERF: the stuff I'm doing in keep_uppy really taps out at 70fps

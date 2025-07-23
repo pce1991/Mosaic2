@@ -235,7 +235,6 @@ void TileDataMoveTowardsTarget(TileData *data, float32 rate) {
 }
 
 void MosaicUpdate() {
-
   Game.spawnTimer += DeltaTime;
 
 //   float32 ballSpawnRate = 8.0f;
