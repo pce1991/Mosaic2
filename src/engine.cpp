@@ -362,6 +362,12 @@ int main(void)
     // @TODO: Mosaic should be accumulating a list of draw text commands 
     // which we iterate and call the correct stuff for
 
+    
+    for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
+      MTile *tile = &Mosaic->tiles[i];
+      DrawTile(tile->position, tile->color);
+    }
+
 #if 0
     {
       MTile *tiles = Mosaic->tiles;
@@ -418,12 +424,6 @@ int main(void)
       }
     }
 #else
-
-    for (int32 i = 0; i < Mosaic->tileCapacity; i++) {
-      MTile *tile = &Mosaic->tiles[i];
-          
-      DrawTile(tile->position, tile->tint);
-    }
 
 #if 0
     SpriteBatchData *sprites = PushArray(FrameMem, SpriteBatchData, Mosaic->tileCapacity);

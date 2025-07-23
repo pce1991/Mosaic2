@@ -123,5 +123,6 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
 
 
 - @BUG: weirdly the bumpers seem to draw with a different texture, until I take a screenshot??? It's more round. I actually like the look but idk why it's happening....
-  
+  I'm not interrupting with any other draw calls so idk
+
 
