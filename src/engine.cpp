@@ -460,9 +460,10 @@ int main(void)
 
       sprite->srcRect = src;
     }
-#endif
 
     TextureBatchRender(sprites, Mosaic->tileCapacity, *texture);
+#endif
+    
 #endif
     
 
