@@ -126,3 +126,12 @@ When the file extension is changed to .cpp the makefile automatically uses g++ i
   I'm not interrupting with any other draw calls so idk
 
 
+
+
+@TODO: allow you to draw without a texture.
+
+@TODO: try a nice tiling texture to give a bit more character to tiles
+
+@TODO: do some nice post-processing like allowing bloom on tiles
+
+@TODO: support an A/B color on tinting for the tiles
